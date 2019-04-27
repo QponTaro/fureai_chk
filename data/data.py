@@ -4,8 +4,32 @@ from collections import namedtuple
 
 
 # 利用日時, 開始, 終了, 館名, 施設名, 支払状況
-practiceInfo = namedtuple('practiceInfo', ('year', 'month', 'day', 'start', 'end', 'bname', 'iname', 'state', 'goodLevel'))
-practiceInf = []
+schedule = namedtuple('schedule', 
+        ('year', 'month', 'day', 'start', 'end', 'kind', 'bname', 'iname', 'state', 'goodLevel'))
+
+scheduleList = []
+scheduleList.append( schedule('2019','4','27','13','17','練習','麻生','視聴覚室', '', '◎' ) )
+scheduleList.append( schedule('2019','5','11','13','17','練習','多摩','視聴覚室', '', '◎' ) )
+scheduleList.append( schedule('2019','5','19','13','17','練習','高津','第１音楽室', '', '◎' ) )
+scheduleList.append( schedule('2019','6','15','13','17','練習','麻生','視聴覚室', '', '◎' ) )
+scheduleList.append( schedule('2019','6','23','13','17','練習','多摩','視聴覚室', '', '◎' ) )
+scheduleList.append( schedule('2019','6','23','13','17','全体ヴォイトレ','中原','音楽室', '', '◎' ) )
+scheduleList.append( schedule('2019','4','28','13','17','ヴォイトレ','多摩','視聴覚室', '', '◎' ) )
+scheduleList.append( schedule('2019','5','6','13','17','ヴォイトレ','多摩','視聴覚室', '', '◎' ) )
+    
+#練習日
+#4/27（土）麻生市民館視聴覚室　午後　新美先生
+#5/11（土）多摩市民館視聴覚室　午後　佐藤先生
+#5/19（日）高津市民館第一音楽室　午後　新美先生
+#6/15（土）麻生市民館視聴覚室　午後　新美先生
+#6/23（日）多摩市民館視聴覚室　午後　佐藤先生
+#
+#全体ヴォイトレ
+#6/2（日）中原市民館音楽室　午後　玉村・佐藤先生
+#
+#個人ヴォイトレ
+#4/28（日）多摩市民館視聴覚室　午後
+#5/6（月）多摩市民館視聴覚室　午後
 
 
 # アカウント情報
