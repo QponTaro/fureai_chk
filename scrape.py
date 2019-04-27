@@ -97,7 +97,7 @@ class FureaiNet:
 
         # webdriver 初期化
         options = Options()
-        #options.add_argument('--headless')
+        options.add_argument('--headless')
         self.driver = webdriver.Chrome(options=options)
 
         self.time = time
