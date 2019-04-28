@@ -68,7 +68,6 @@ class FureaiNet:
 
         print( args )
 
-
         self.SMTP_USER   = args.smtp_user
         self.SMTP_PASSWD = args.smtp_passwd
         self.FROM_ADDRESS = args.from_addr
