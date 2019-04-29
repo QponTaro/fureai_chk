@@ -223,33 +223,39 @@ class FureaiNet:
             print('0:空きサーチ2\n')
             result_msg += self._get_free_room2( date_from, date_to )
         
-        # 各アカウントで収集
-        for login_name in dic.card_ID:
-            print('アカウント:{}'.format(login_name))
-            result_msg += self._login( login_name )
-            
-            # ログインできなかったら コンティニュー
-            if self.login_state == False:
-                continue
+        # Reserve 各アカウントで収集
+        if ("rsv" in self.EXEC_MODE):
+            for login_name in dic.card_ID:
+                print('アカウント:{}'.format(login_name))
+                result_msg += self._login( login_name )
+                
+                # ログインできなかったら コンティニュー
+                if self.login_state == False:
+                    continue
 
-            # 予約サーチする場合
-            if ("rsv" in self.EXEC_MODE):
+                # 予約サーチする場合
                 print('1:予約サーチ({})\n'.format(login_name))
                 result_msg += self._get_reserve_list( login_name )
-                
-            # 空き探索する場合
-        #    if ("chk" in self.EXEC_MODE):
-        #        if login_name == "歌の会": # どれか１つのアカウントで確認すればOK
-        #            print('2:空きサーチ({})\n'.format(login_name))
-        #            result_msg += self._get_free_room( date_from, date_to )
             
-            # 抽選結果確認する場合
-            if( "lot" in self.EXEC_MODE):
+                # 最後にログオフ
+                result_msg += self._logoff()
+
+        # LOT 各アカウントで収集
+        if ("lot" in self.EXEC_MODE):
+            for login_name in dic.card_ID:
+                print('アカウント:{}'.format(login_name))
+                result_msg += self._login( login_name )
+                
+                # ログインできなかったら コンティニュー
+                if self.login_state == False:
+                    continue
+
+                # 抽選結果確認する場合
                 print('3:抽選サーチ({})\n'.format(login_name))
                 result_msg += self._get_lot_list( login_name )
             
-            # 最後にログオフ
-            result_msg += self._logoff()
+                # 最後にログオフ
+                result_msg += self._logoff()
 
         return result_msg            
 
