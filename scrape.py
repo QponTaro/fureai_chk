@@ -95,8 +95,14 @@ class FureaiNet:
         self.logger.addHandler(fh)
 
         # webdriver 初期化
+
+        # Heroku以外ではNone
         options = Options()
-        options.add_argument('--headless')
+        if chrome_binary_path:
+            options.binary_location = chrome_binary_path
+            options.add_argument('--headless')
+        else:
+            options.add_argument('--headless')
         self.driver = webdriver.Chrome(options=options)
 
         self.time = time
