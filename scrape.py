@@ -99,11 +99,23 @@ class FureaiNet:
         # Heroku以外ではNone
         options = Options()
         if chrome_binary_path:
-            options.binary_location = chrome_binary_path
+
+            # chromeのパスを指定する。今回は環境変数から取得
+            binary_location = os.environ['CHROME_BINARY_LOCATION']
+            driver_path = os.environ['CHROME_DRIVER_PATH']
+            options.binary_location = binary_location
+
+            # headlessで使用する場合は以下の2行を利用する。
             options.add_argument('--headless')
+            # options.add_argument('--disable-gpu')
+
+            # webdriverを起動する。引数executable_pathにwebdriverのパスを指定する。
+            # こちらも環境変数から取得
+            self.driver = webdriver.Chrome(
+                    options=options, executable_path=driver_path)
         else:
             options.add_argument('--headless')
-        self.driver = webdriver.Chrome(options=options)
+            self.driver = webdriver.Chrome(options=options)
 
         self.time = time
         self.from_time = from_time
