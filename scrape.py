@@ -98,7 +98,8 @@ class FureaiNet:
 
         # Heroku以外ではNone
         options = Options()
-        if chrome_binary_path:
+        isHeroku = os.environ['IS_HEROKU']
+        if isHeroku == "True":
 
             # chromeのパスを指定する。今回は環境変数から取得
             binary_location = os.environ['CHROME_BINARY_LOCATION']
