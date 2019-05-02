@@ -39,6 +39,8 @@ import subs.datesub as datesub
 import data.data as data
 import data.data as dic
 
+import data.rw_csv as rw_csv
+
 class FureaiNet:
     def __init__(self, from_time, to_time):
 
@@ -50,7 +52,9 @@ class FureaiNet:
         env_CC_ADDRESS  = os.getenv('CC_ADDRESS')
         env_BCC_ADDRESS = os.getenv('BCC_ADDRESS')
         env_FC_EXEC_MODE = os.getenv('FC_EXEC_MODE')
-
+        env_MAIL_SUBJECT = os.getenv('MAIL_SUBJECT','>>ふれあいネット情報<< (Local)')
+        isHeroku = os.getenv('IS_HEROKU',False)
+        
         # コマンドライン引数の吸出し
         parser = argparse.ArgumentParser(description='ふれあいネットチェッカー')    # 2. パーサを作る
 
@@ -61,6 +65,8 @@ class FureaiNet:
         parser.add_argument('--to_addr', help='to adress', default=env_TO_ADDRESS)    # オプション引数（指定しなくても良い引数）を追加
         parser.add_argument('--cc_addr', help='cc adress', default=env_CC_ADDRESS)    # オプション引数（指定しなくても良い引数）を追加
         parser.add_argument('--bcc_addr', help='bcc adress', default=env_BCC_ADDRESS)    # オプション引数（指定しなくても良い引数）を追加
+        parser.add_argument('--mail_subject', help='mail subject', default=env_MAIL_SUBJECT)    # オプション引数（指定しなくても良い引数）を追加
+        
         parser.add_argument('--exec_mode', help='execute mode [lot/rsv/chk]', default=env_FC_EXEC_MODE)    # オプション引数（指定しなくても良い引数）を追加
         parser.add_argument('-a', '--arg4')   # よく使う引数なら省略形があると使う時に便利
 
@@ -74,7 +80,7 @@ class FureaiNet:
         self.TO_ADDRESS  = args.to_addr
         self.CC_ADDRESS  = args.cc_addr
         self.BCC_ADDRESS = args.bcc_addr
-        self.SUBJECT = '【ソレイユ】ふれあいネット 情報配信'
+        self.SUBJECT = args.mail_subject
         self.BODY = 'pythonでメール送信 テスト'
 
         self.EXEC_MODE = args.exec_mode
@@ -98,7 +104,7 @@ class FureaiNet:
 
         # Heroku以外ではNone
         options = Options()
-        isHeroku = os.environ['IS_HEROKU']
+        # isHeroku = os.getenv('IS_HEROKU',False)
         if isHeroku == "True":
 
             # chromeのパスを指定する。今回は環境変数から取得
@@ -115,7 +121,7 @@ class FureaiNet:
             self.driver = webdriver.Chrome(
                     options=options, executable_path=driver_path)
         else:
-            options.add_argument('--headless')
+            # options.add_argument('--headless')
             self.driver = webdriver.Chrome(options=options)
 
         self.time = time
@@ -123,6 +129,7 @@ class FureaiNet:
         self.to_time = to_time
 
         self.login_state = False
+        self.data = []
 
     # private method
 
@@ -319,19 +326,51 @@ class FureaiNet:
                     iname = tr.find_element( By.ID, 'igcdnamem').text
                     state = tr.find_element( By.ID, 'lotStateLabel').text
 
+                    # ymd から y,m,d,w を取得
+                    year = ymd[0:3]
+                    month = ymd[5:6]
+                    day = ymd[8:9]
+                    week = datesub.get_weekstr(year,month,day)
+
                     ymd = datesub.cnv_datestr(ymd)
                     stime = stime.replace("時","")
-                    stime = stime.replace("分","")
                     etime = etime.replace("時","")
                     bname = bname.replace("市民館","")
                     bname = bname.replace("分館","")
+                    iname = iname.replace("室","")
+                    
+                    # よりよい場所があれば... レベル
+                    roomName = bname+"／"+iname
+                    goodLevel = dic.chorus_ROOM[ roomName ]
 
                     print( "日時：{}[{}~{}], 施設:{}/{}, 結果:{}".format( ymd,stime,etime,bname,iname,state ))
     
                     # リストに追加
-                    data.lotInf.append(data.lotInfo(username, ymd,stime,etime,bname,iname,state))
-        
-        #print('')
+                    #data.room_stat.append([curYear, curMonth, curDay, curWeek, room_str, rsvStat])
+                    #roomStat = namedtuple('roomStat', ('year', 'month', 'day', 'week', 'room', 'am', 'pm', 'night'))
+                    
+                    #('username','year', 'month', 'day', 'week', 'start','end','bname', 'iname', 'am', 'pm', 'night','goodLevel')
+                    data.roomSt.append(
+                        data.roomStat(
+                            type = '抽選予約状況',
+                            username = username,  # username
+                            year = year,
+                            month = month,
+                            day = day, 
+                            week = week, 
+                            start = stime, 
+                            end = etime,
+                            bname = bname, 
+                            iname = iname,
+                            state = state,
+                            am = '', 
+                            pm = '', 
+                            night = '',
+                            goodLevel = goodLevel
+                            )
+                        )
+                    
+                    print( data.roomSt )
 
         return result_msg
 
@@ -392,6 +431,12 @@ class FureaiNet:
                     iname = tr.find_element( By.ID, 'inamem').text
                     state = tr.find_element( By.ID, 'stateLabel').text
 
+                    # ymd から y,m,d,w を取得
+                    year = ymd[0:3]
+                    month = ymd[5:6]
+                    day = ymd[8:9]
+                    week = datesub.get_weekstr(year,month,day)
+                    
                     ymd = datesub.cnv_datestr(ymd)
                     stime = stime.replace("時","")
                     etime = etime.replace("時","")
@@ -403,142 +448,39 @@ class FureaiNet:
                     roomName = bname+"／"+iname
                     goodLevel = dic.chorus_ROOM[ roomName ]
 
-                    #if ("岡上" in bname)or("宮前"in bname):
-                    #    goodLevel = '△'
-                    #elif ('9' in stime):
-                    #    goodLevel = '▲'
-                    #else:
-                    #    goodLevel = '〇'
-
                     print( "日時：{}[{}~{}], 施設:{}/{}, 支払:{}".format( ymd,stime,etime,bname,iname,state ))
     
                     # リストに追加
-                    data.rsvInf.append(data.rsvInfo(username, ymd,stime,etime,bname,iname,state,goodLevel))
-        
-        #print('')
+                    #data.room_stat.append([curYear, curMonth, curDay, curWeek, room_str, rsvStat])
+                    #roomStat = namedtuple('roomStat', ('year', 'month', 'day', 'week', 'room', 'am', 'pm', 'night'))
+                    
+                    #('username','year', 'month', 'day', 'week', 'start','end','bname', 'iname', 'am', 'pm', 'night','goodLevel')
+                    data.roomSt.append(
+                        data.roomStat(
+                            type = '予約状況',
+                            username = username,  # username
+                            year = year,
+                            month = month,
+                            day = day, 
+                            week = week, 
+                            start = stime, 
+                            end = etime,
+                            bname = bname, 
+                            iname = iname,
+                            state = state, 
+                            am = '', 
+                            pm = '', 
+                            night = '',
+                            goodLevel = goodLevel
+                            )
+                        )
+                    
+                    print( data.roomSt )
 
         return result_msg
 
+    
     # 空き施設確認
-    def _get_free_room(self, date_from, date_to):
-
-        result_msg = ""
-
-        # ログイン済みチェック
-        if self.login_state == False:
-            print('ログインしていません')
-            result_msg += "未ログイン"
-            return result_msg
-
-        # 施設ループ
-        for index, room in enumerate(dic.chorus_ROOM.keys()):
-            print("■ index:{0} room:{1}".format(index, room))
-            cur_msg = self._search_free_by_room(room, date_from, date_to)
-            result_msg += cur_msg
-
-        return result_msg
-
-    def _search_free_by_room(self, chorus_room, date_from, date_to):
-
-        result_msg = ""
-
-        # ログイン済みチェック
-        if self.login_state == False:
-            print('ログインしていません')
-            result_msg += "未ログイン"
-            return result_msg
-
-        # 指定された 施設 の予約状況を確認
-        url = "https://www.fureai-net.city.kawasaki.jp/user/view/user/rsvEmptyState.html?"
-        url += "bcd=" + dic.room_bcd[chorus_room]
-        url += "&icd=" + dic.room_icd[chorus_room]
-        self.driver.get(url)
-
-        # 施設名の取得
-        room_elements = self.driver.find_elements_by_id("blabel")
-        if len(room_elements) > 0:
-            for rele in room_elements:
-                bname_eles = rele.find_elements_by_id("bnamem")
-                iname_eles = rele.find_elements_by_id("inamem")
-                bname = bname_eles[0].text
-                bname = bname.replace( "市民館","" )
-                bname = bname.replace( "分館","" )
-                iname = iname_eles[0].text
-                iname = iname.replace( "室","" )
-                print('■ 施設:{0}, 部屋:{1}'.format(bname, iname))
-                room_str = '{0}/{1}'.format(bname, iname)
-                if ("岡上" in bname)or("宮前"in bname):
-                    goodLevel = '△'
-                else:
-                    goodLevel = '〇'
-
-
-        # === 日付ループ ===
-        curDate = date_from
-        days = (date_to-date_from).days
-        for dayCnt in range(days):  # 200日間チェック
-
-            # 日付の更新 とりあえず先に更新しておく
-            curDate = curDate + datetime.timedelta(days=1)
-
-            curYear    = curDate.year
-            curMonth   = curDate.month
-            curDay     = curDate.day
-            curWeek    = datesub.get_weekstr( curYear, curMonth, curDay )
-            curHoliday = datesub.chk_holiday( curYear, curMonth, curDay )
-
-            # 土日祝 以外は対象外
-            if curDate >= date_to:
-                print(date_to)
-            if ((curWeek == "土") or (curWeek == "日") or (curHoliday != None)):
-
-                # Webページ上の 対象施設の 日付の更新
-                day_string = str(curYear)+","+str(curMonth)+","+str(curDay)
-                script_str = "javascript:selectCalendarDate(" + \
-                    day_string+");return false;"
-                self.driver.execute_script(script_str)
-                #print("# 日付：{0}/{1}({2}): 場所:{3}".
-                #      format(month, day, curWeek, room_str), end="")
-
-                # 予約状況の取得
-                #  class:'time-table1' は見出し行、'time-table2' は 予約状況
-                rsvStat = ["", "", ""]
-                tds = self.driver.find_elements_by_class_name('time-table2')
-                for i in range(len(tds)):  # 3つの td で構成。0:午前, 1:午後, 2:夜
-                    td = tds[i]
-                    sel_ele = td.find_element_by_id("sel")
-                    #bcd_ele   = td.find_element_by_id("bcd")
-                    tzone_ele = td.find_element_by_id("tzoneno")
-                    state_ele = td.find_element_by_tag_name("img")
-
-                    #sel_name    = sel_ele.get_attribute("name")
-                    sel_value = sel_ele.get_attribute("value")
-                    #bcd_name    = bcd_ele.get_attribute("name")
-                    #bcd_value   = bcd_ele.get_attribute("value")
-                    #tzone_name  = tzone_ele.get_attribute("name")
-                    tzone_value = tzone_ele.get_attribute("value")
-                    state_alt = state_ele.get_attribute("alt")
-
-                    state = dic.state_tbl[state_alt]
-                    tzone_str = dic.tzone_tbl[tzone_value]
-                    rsvStat[i] = sel_value
-
-                # リストに追加
-                data.room_stat.append(
-                    [curYear, curMonth, curDay, curWeek, room_str, rsvStat])
-                #roomStat = namedtuple('roomStat', ('year', 'month', 'day', 'week', 'room', 'am', 'pm', 'night'))
-                data.roomSt.append(data.roomStat(
-                    curYear, curMonth, curDay, curWeek, 
-                    room_str, 
-                    rsvStat[0], rsvStat[1], rsvStat[2],
-                    goodLevel
-                    ))
-
-                #print('')
-
-        return result_msg
-
-# 空き施設確認
     def _get_free_room2(self, date_from, date_to):
 
         result_msg = ""
@@ -607,7 +549,7 @@ class FureaiNet:
         # 施設名の取得
 
         print('■ 施設:{0}, 部屋:{1}'.format(bname, iname))
-        room_str = '{0}/{1}'.format(bname, iname)
+        # room_str = '{0}/{1}'.format(bname, iname)
         goodLevel = dic.chorus_ROOM[chorus_room]
         
         # === 日付ループ ===
@@ -661,17 +603,40 @@ class FureaiNet:
                     rsvStat[i] = sel_value
 
                 # リストに追加
-                data.room_stat.append(
-                    [curYear, curMonth, curDay, curWeek, room_str, rsvStat])
+                #data.room_stat.append([curYear, curMonth, curDay, curWeek, room_str, rsvStat])
                 #roomStat = namedtuple('roomStat', ('year', 'month', 'day', 'week', 'room', 'am', 'pm', 'night'))
-                data.roomSt.append(data.roomStat(
-                    curYear, curMonth, curDay, curWeek, 
-                    room_str, 
-                    rsvStat[0], rsvStat[1], rsvStat[2],
-                    goodLevel
-                    ))
-
-                #print('')
+                
+                # (
+                #         'type',
+                #         'username',
+                #         'year', 'month', 'day', 'week', 
+                #         'start','end',
+                #         'bname', 'iname', 
+                #         'state', 
+                #         'am', 'pm', 'night',
+                #         'goodLevel'
+                # )
+                data.roomSt.append(
+                    data.roomStat(
+                        type = "空き検索",
+                        username = '---',  # username
+                        year = curYear,
+                        month = curMonth,
+                        day = curDay, 
+                        week = curWeek, 
+                        start = 'start', 
+                        end = 'end',
+                        bname = bname, 
+                        iname = iname,
+                        state = '---', 
+                        am = rsvStat[0], 
+                        pm = rsvStat[1], 
+                        night = rsvStat[2],
+                        goodLevel = goodLevel,
+                        )
+                    )
+                
+                print( data.roomSt )
 
         return result_msg
 
@@ -705,6 +670,11 @@ class FureaiNet:
 
     def run(self):
         try:
+            # dataを読み込む
+            FCHK_DATA = "data/fchk_data.csv"
+            self.data = ""
+            rw_csv.read_data( FCHK_DATA, data.roomSt )
+
 
             # メール送信パラメータチェック
             msg = self._chk_mail_parameter()
@@ -729,6 +699,9 @@ class FureaiNet:
             # 取得開始
             msg = self._first_loop( date_from, date_to )
             
+            # dataを書き出す
+            rw_csv.write_data( FCHK_DATA, data.roomSt )
+
             # ログメッセージ
             msg = ">> ふれあいネット 情報 <<\n"
             msg += "※{} 現在\n".format( today.strftime("%Y-%m-%d %H:%M:%S"))
@@ -749,63 +722,70 @@ class FureaiNet:
                 for i in roomSt2:
                     if i.pm == "0":
                         if i.goodLevel in {'〇', '◎', '◆'}:
-                            print(i.year, i.month, i.day, i.week,
-                                i.room, i.am, i.pm, i.night)
-                            msg += "{0}/{1:02}/{2:02}({3}) {4}({5})\n".format(
-                                str(i.year)[2:], i.month, i.day, i.week, i.room, i.goodLevel )
-
+                            #('username','year', 'month', 'day', 'week', 'start','end',
+                            # 'bname', 'iname', 
+                            # 'am', 'pm', 'night','goodLevel')
+                            print( i )
+                            msg += "{0} {1}/{2}/{3}{4} {5}~{6} {7}/{8}({9})\n".format(
+                                i.username[0:1],
+                                str(i.year)[2:], i.month, i.day, i.week,  
+                                i.start, i.end, i.bname, i.iname, i.goodLevel )
             # 予約情報２
-            if data.rsvInf:
+            if False:  # data.rsvInf:
                 # 期間
                 msg += "----------\n"
                 msg += "よりよい会議室があれば取りたいリスト\n"
                 msg += "----------\n"
                 
                 # 収集リストの表示
-                rsvInf2 = sorted( data.rsvInf, key=lambda x:(x[1],x[0]) )
+                rsvInf2 = sorted( data.roomSt, key=lambda x:(x[1],x[0]) )
                 
                 # 利用日時, 開始, 終了, 館名, 施設名, 支払状況
                 for i in rsvInf2:
                     if i.goodLevel in {'◎'}:  # 最高の場所が確保できている
                         pass
                     elif i.goodLevel in {"〇","△","◆"}:
-                            # 最高ではない
-                            # 今一つ
-                            # 今一つか、ボイトレ用
-                        print(i.date, i.start, i.end, i.bname, i.iname, i.state)
-                        msg += "{0} {1}{2}~{3} {4}/{5}({6})\n".format(i.username[0:1], 
-                            i.date, i.start, i.end, i.bname, i.iname, i.goodLevel )
-            
+                        # 最高ではない
+                        # 今一つ
+                        # 今一つか、ボイトレ用
+                        #('username','year', 'month', 'day', 'week', 'start','end',
+                        # 'bname', 'iname', 
+                        # 'am', 'pm', 'night','goodLevel')
+                        print( i )
+                        msg += "{0} {1}/{2}/{3}{4} {5}~{6} {7}/{8}({9})\n".format(
+                            i.username[0:1],
+                            str(i.year)[2:], i.month, i.day, i.week,  
+                            i.start, i.end, i.bname, i.iname, i.goodLevel )
             # 予約情報
-            if data.rsvInf:
+            if False:  # data.rsvInf:
                 # 期間
                 msg += "----------\n"
                 msg += "期間：{}～{}の 予約状況\n".format( date_from.strftime("%Y-%m-%d"), date_to.strftime("%Y-%m-%d"))
                 msg += "----------\n"
                 
                 # 収集リストの表示
-                rsvInf2 = sorted( data.rsvInf, key=lambda x:(x[1],x[0]) )
+                rsvInf2 = sorted( data.roomSt, key=lambda x:(x[1],x[0]) )
                 
                 # 利用日時, 開始, 終了, 館名, 施設名, 支払状況
                 for i in rsvInf2:
-                    print(i.date, i.start, i.end, i.bname, i.iname, i.state)
-                    msg += "{0} {1}{2}~{3} {4}/{5}({6})\n".format(i.username[0:1], 
-                        i.date, i.start, i.end, i.bname, i.iname, i.goodLevel )
-
-           # 抽選情報
-            # if False:
-            if data.lotInf:
+                    print(i)
+                    msg += "{0} {1}/{2}/{3}{4} {5}~{6} {7}/{8}({9})\n".format(
+                            i.username[0:1],
+                            str(i.year)[2:], i.month, i.day, i.week,  
+                            i.start, i.end, i.bname, i.iname, i.goodLevel )
+            # 抽選情報
+            if False:  # data.lotInf:
                 # 期間
                 msg += "----------\n"
                 msg += "期間：{}～{}の 抽選申込状況\n".format( date_from.strftime("%Y-%m-%d"), date_to.strftime("%Y-%m-%d"))
                 msg += "----------\n"
                 
                 # 収集リストの表示
-                lotInf2 = sorted( data.lotInf, key=lambda x:(x[1],x[0]) )
+                lotInf2 = sorted( data.roomSt, key=lambda x:(x[1],x[0]) )
                 
                 # 利用日時, 開始, 終了, 館名, 施設名, 支払状況
                 for i in lotInf2:
-                    print(i.date, i.start, i.end, i.bname, i.iname, i.state)
+                    print(i)
                     msg += "{0} {1}{2}~{3} {4}/{5}({6})\n".format(
                         i.username[0:1], 
                         i.date, i.start, i.end, 

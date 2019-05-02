@@ -5,17 +5,17 @@ from collections import namedtuple
 
 # 利用日時, 開始, 終了, 館名, 施設名, 支払状況
 schedule = namedtuple('schedule', 
-        ('year', 'month', 'day', 'start', 'end', 'kind', 'bname', 'iname', 'state', 'goodLevel'))
+        ('year', 'month', 'day', 'week', 'start', 'end', 'kind', 'bname', 'iname', 'state', 'goodLevel'))
 
 scheduleList = []
-scheduleList.append( schedule('2019','4','27','13','17','練習','麻生','視聴覚室', '', '◎' ) )
-scheduleList.append( schedule('2019','5','11','13','17','練習','多摩','視聴覚室', '', '◎' ) )
-scheduleList.append( schedule('2019','5','19','13','17','練習','高津','第１音楽室', '', '◎' ) )
-scheduleList.append( schedule('2019','6','15','13','17','練習','麻生','視聴覚室', '', '◎' ) )
-scheduleList.append( schedule('2019','6','23','13','17','練習','多摩','視聴覚室', '', '◎' ) )
-scheduleList.append( schedule('2019','6','23','13','17','全体ヴォイトレ','中原','音楽室', '', '◎' ) )
-scheduleList.append( schedule('2019','4','28','13','17','ヴォイトレ','多摩','視聴覚室', '', '◎' ) )
-scheduleList.append( schedule('2019','5','6','13','17','ヴォイトレ','多摩','視聴覚室', '', '◎' ) )
+scheduleList.append( schedule('2019','4','27','土','13','17','練習','麻生','視聴覚室', '確定', '◎' ) )
+scheduleList.append( schedule('2019','5','11','土','13','17','練習','多摩','視聴覚室', '確定', '◎' ) )
+scheduleList.append( schedule('2019','5','19','日','13','17','練習','高津','第１音楽室', '確定', '◎' ) )
+scheduleList.append( schedule('2019','6','15','土','13','17','練習','麻生','視聴覚室', '確定', '◎' ) )
+scheduleList.append( schedule('2019','6','23','日','13','17','練習','多摩','視聴覚室', '確定', '◎' ) )
+scheduleList.append( schedule('2019','6','2','日','13','17','全体ヴォイトレ','中原','音楽室', '確定', '◎' ) )
+scheduleList.append( schedule('2019','4','28','土','13','17','ヴォイトレ','多摩','視聴覚室', '確定', '◎' ) )
+scheduleList.append( schedule('2019','5','6','土','13','17','ヴォイトレ','多摩','視聴覚室', '確定', '◎' ) )
     
 #練習日
 #4/27（土）麻生市民館視聴覚室　午後　新美先生
@@ -33,27 +33,44 @@ scheduleList.append( schedule('2019','5','6','13','17','ヴォイトレ','多摩
 
 
 # アカウント情報
-accountInfo = namedtuple('accountInfo',('username','userid','passwd','rsvCount','lotCount'))
+accountInfo = namedtuple('accountInfo',
+    ('username','userid','passwd','rsvCount','lotCount')
+    )
 accountInf = []
 
-# 利用日時, 開始, 終了, 館名, 施設名, 支払状況
-rsvInfo = namedtuple('rsvInfo', ('username','date','start','end','bname', 'iname', 'state','goodLevel'))
-rsvInf = []
-
-# 利用日時, 開始, 終了, 館名, 施設名, 支払状況
-lotInfo = namedtuple('lotInfo', ('username','date','start','end','bname', 'iname', 'state'))
-lotInf = []
-
-
-roomStat = namedtuple('roomStat', ('year', 'month', 'day', 'week', 'room', 'am', 'pm', 'night','goodLevel'))
+roomStat = namedtuple('roomStat', 
+        (
+            'type',
+            'username',
+            'year', 'month', 'day', 'week', 
+            'start','end',
+            'bname', 'iname', 
+            'state', 
+            'am', 'pm', 'night',
+            'goodLevel'
+        )
+    )
 roomSt = []
-room_stat = [["Year", "Month", "Day", "Week", "room", ["AM", "PM", "Night"]]]
 
-reserveData = []
+# 利用日時, 開始, 終了, 館名, 施設名, 支払状況
+#rsvInfo = namedtuple('rsvInfo', 
+#    ('username','year', 'month', 'day', 'week', 'start','end','bname', 'iname', 'state','goodLevel')
+#    )
+#rsvInf = []
+
+# 利用日時, 開始, 終了, 館名, 施設名, 支払状況
+#lotInfo = namedtuple('lotInfo', 
+#    ('username','year', 'month', 'day', 'week', 'start','end','bname', 'iname', 'state')
+#    )
+#lotInf = []
+
+
+# room_stat = [ ["Year", "Month", "Day", "Week", "room", ["AM", "PM", "Night"] ] ]
+
+# card_LIST = ["歌の会","高橋良"]
+
 
 # 辞書定義
-card_LIST = ["歌の会","高橋良"]
-
 card_ID = {
     "歌の会": "5040302",
     "ハワイアン": "5106148",
