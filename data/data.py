@@ -5,7 +5,20 @@ from collections import namedtuple
 
 # 利用日時, 開始, 終了, 館名, 施設名, 支払状況
 schedule = namedtuple('schedule', 
-        ('year', 'month', 'day', 'week', 'start', 'end', 'kind', 'bname', 'iname', 'state', 'goodLevel'))
+        (
+            'year', 
+            'month', 
+            'day', 
+            'week', 
+            'start', 
+            'end', 
+            'kind', 
+            'bname', 
+            'iname', 
+            'state', 
+            'rank'
+        )
+    )
 
 scheduleList = []
 scheduleList.append( schedule('2019','4','27','土','13','17','練習','麻生','視聴覚室', '確定', '◎' ) )
@@ -16,7 +29,8 @@ scheduleList.append( schedule('2019','6','23','日','13','17','練習','多摩',
 scheduleList.append( schedule('2019','6','2','日','13','17','全体ヴォイトレ','中原','音楽室', '確定', '◎' ) )
 scheduleList.append( schedule('2019','4','28','土','13','17','ヴォイトレ','多摩','視聴覚室', '確定', '◎' ) )
 scheduleList.append( schedule('2019','5','6','土','13','17','ヴォイトレ','多摩','視聴覚室', '確定', '◎' ) )
-    
+
+
 #練習日
 #4/27（土）麻生市民館視聴覚室　午後　新美先生
 #5/11（土）多摩市民館視聴覚室　午後　佐藤先生
@@ -31,14 +45,21 @@ scheduleList.append( schedule('2019','5','6','土','13','17','ヴォイトレ','
 #4/28（日）多摩市民館視聴覚室　午後
 #5/6（月）多摩市民館視聴覚室　午後
 
+def chk_schedule( year, month, day ):
+    for sc in scheduleList:
+        if( sc.year == year) and ( sc.month == month) and (sc.day == day):
+            return sc
+        else:
+            return None
+
 
 # アカウント情報
 accountInfo = namedtuple('accountInfo',
-    ('username','userid','passwd','rsvCount','lotCount')
+        ('username','userid','passwd','rsvCount','lotCount')
     )
 accountInf = []
 
-roomStat = namedtuple('roomStat', 
+room_datum = namedtuple('room_datum', 
         (
             'type',
             'username',
@@ -47,14 +68,14 @@ roomStat = namedtuple('roomStat',
             'bname', 'iname', 
             'state', 
             'am', 'pm', 'night',
-            'goodLevel'
+            'rank'
         )
     )
-roomSt = []
+room_data = []
 
 # 利用日時, 開始, 終了, 館名, 施設名, 支払状況
 #rsvInfo = namedtuple('rsvInfo', 
-#    ('username','year', 'month', 'day', 'week', 'start','end','bname', 'iname', 'state','goodLevel')
+#    ('username','year', 'month', 'day', 'week', 'start','end','bname', 'iname', 'state','rank')
 #    )
 #rsvInf = []
 

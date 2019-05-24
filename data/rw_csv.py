@@ -1,4 +1,13 @@
+
 import csv
+
+# 名前付きタプル
+from collections import namedtuple
+
+try:
+    from itertools import imap
+except ImportError:  # Python 3
+    imap = map
 
 # with open('data.csv') as fp:
 #     lst = list(csv.reader(fp))
@@ -19,3 +28,11 @@ def read_data( fname, data ):
         
         for row in reader:
             data.append( list(row) )
+
+def read_test():
+
+        with open("data_file.txt", mode="rb") as infile:
+                reader = csv.reader(infile)
+                Data = namedtuple("Data", next(reader))  # get names from column headers
+                for data in imap(Data._make, reader):
+                        print(data.foo)
