@@ -3,3 +3,6 @@ venv/
 _log/
 __pycache__/
 *.pyc
+*.csv
+*.xlsx
+*.log
