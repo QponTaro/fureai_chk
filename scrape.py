@@ -95,7 +95,8 @@ class FureaiNet:
 
         # ファイルへ出力するハンドラーを定義
         self.today = datetime.datetime.now()
-        self.logFile = "_log\\Fureai-Net_{}.log".format( self.today.strftime("%Y%m%d_%H%M%S") )
+        #self.logFile = "_log\\Fureai-Net_{}.log".format( self.today.strftime("%Y%m%d_%H%M%S") )
+        self.logFile = "_log\\Fureai-Net_{}.log".format( self.today.strftime("%Y%m%d") )
         print('logFile:'+self.logFile)
         fh = logging.FileHandler( filename=self.logFile, mode='w', encoding='utf-8')
         fh.setLevel(logging.INFO)
@@ -331,11 +332,11 @@ class FureaiNet:
                     state = tr.find_element( By.ID, 'lotStateLabel').text
 
                     # ymd から y,m,d,w を取得
-                    year = ymd[0:3]
-                    month = ymd[5:6]
-                    day = ymd[8:9]
+                    year = datesub.get_year(ymd)
+                    month = datesub.get_month(ymd)
+                    day = datesub.get_day(ymd)
                     week = datesub.get_weekstr(year,month,day)
-
+                    
                     ymd = datesub.cnv_datestr(ymd)
                     stime = stime.replace("時","")
                     etime = etime.replace("時","")
@@ -356,7 +357,7 @@ class FureaiNet:
                     #('username','year', 'month', 'day', 'week', 'start','end','bname', 'iname', 'am', 'pm', 'night','rank')
                     room_data.append(
                         room_datum(
-                            type = '抽選予約状況',
+                            type = '抽選',
                             username = username,  # username
                             year = year,
                             month = month,
@@ -374,7 +375,7 @@ class FureaiNet:
                             )
                         )
                     
-                    print( room_data[-1]+'\n' )
+                    print( room_data[-1] )
 
         return result_msg
 
@@ -436,9 +437,9 @@ class FureaiNet:
                     state = tr.find_element( By.ID, 'stateLabel').text
 
                     # ymd から y,m,d,w を取得
-                    year = ymd[0:3]
-                    month = ymd[5:6]
-                    day = ymd[8:9]
+                    year = datesub.get_year(ymd)
+                    month = datesub.get_month(ymd)
+                    day = datesub.get_day(ymd)
                     week = datesub.get_weekstr(year,month,day)
                     
                     ymd = datesub.cnv_datestr(ymd)
@@ -461,7 +462,7 @@ class FureaiNet:
                     #('username','year', 'month', 'day', 'week', 'start','end','bname', 'iname', 'am', 'pm', 'night','rank')
                     room_data.append(
                         room_datum(
-                            type = '予約状況',
+                            type = '予約',
                             username = username,  # username
                             year = year,
                             month = month,
@@ -622,7 +623,7 @@ class FureaiNet:
                 # )
                 room_data.append(
                     room_datum(
-                        "空き検索",
+                        "空き",
                         '---', 
                         curYear, 
                         curMonth,
@@ -716,23 +717,32 @@ class FureaiNet:
             # 今日の日付を取得
             today = datetime.datetime.now()
             
-            # 開始日は今日
-            date_from = today
+            # 開始日は今日の翌々月1日
+            date_from = (today + relativedelta(months=2)
+                       ).replace(day=1)
+            
 
             # 29日-30/31までは、４か月後の月末
             # 1日～28日までは 3カ月後の月末
-            if today.day >=29:
+            if today.day >=23:
                 addMonth = 5
             else:
                 addMonth = 4
-            date_to = (date_from + relativedelta(months=addMonth)
+            date_to = (today + relativedelta(months=addMonth)
                        ).replace(day=1) - datetime.timedelta(days=1)
             
             # 取得開始
             msg = self._first_loop( date_from, date_to )
+
+            # data をソート
+            room_data2 = sorted( room_data, key=lambda x:(x[0],x[2],x[3],x[4]) )
             
             # dataを書き出す
-            rw_csv.write_data( FCHK_DATA, room_data )
+            rw_csv.write_data( FCHK_DATA, room_data2 )
+
+            chk_data = list( filter( lambda x: '空き' in x[0], room_data2 ) )
+            rsv_data = list( filter( lambda x: '予約' in x[0], room_data2 ) )
+            lot_data = list( filter( lambda x: '抽選' in x[0], room_data2 ) )
 
             # ログメッセージ
             msg = ">> ふれあいネット 情報 <<\n"
@@ -740,7 +750,7 @@ class FureaiNet:
             mailMsg = ""
             
             # 空き情報２
-            if len( room_data ) > 0:
+            if ("chk" in self.EXEC_MODE):
                 # 期間
                 msg += "----------\n"
                 # msg += "期間：{}～{}\n".format( date_from.strftime("%Y-%m-%d"), date_to.strftime("%Y-%m-%d"))
@@ -749,10 +759,7 @@ class FureaiNet:
                 msg += "----------\n"
                 
                 # 収集リストの表示
-                room_data.sort( key=lambda x:( x[0], x[2] ), reverse=False )
-                #room_data2 = sorted( room_data )
-                #room_data2 = sorted( self.room_data, key=lambda x:(x[4],x[1]) )
-                for i in room_data:
+                for i in chk_data:
                     if i.pm == "0":
                         if i.rank in {'〇', '◎', '◆'}:
                             #('username','year', 'month', 'day', 'week', 'start','end',
@@ -764,20 +771,19 @@ class FureaiNet:
                                 str(i.year)[2:], i.month, i.day, i.week,  
                                 i.start, i.end, i.bname, i.iname, i.rank )
             # 予約情報２
-            if False:  # rsvInf:
+            if ("rsv" in self.EXEC_MODE):
                 # 期間
                 msg += "----------\n"
                 msg += "よりよい会議室があれば取りたいリスト\n"
                 msg += "----------\n"
-                
+
                 # 収集リストの表示
-                rsvInf2 = sorted( room_data, key=lambda x:(x[1],x[0]) )
-                
                 # 利用日時, 開始, 終了, 館名, 施設名, 支払状況
-                for i in rsvInf2:
+                for i in rsv_data:
                     if i.rank in {'◎'}:  # 最高の場所が確保できている
                         pass
-                    elif i.rank in {"〇","△","◆"}:
+                    
+                    if i.rank in {"〇","△","◆"}:
                         # 最高ではない
                         # 今一つ
                         # 今一つか、ボイトレ用
@@ -790,38 +796,34 @@ class FureaiNet:
                             str(i.year)[2:], i.month, i.day, i.week,  
                             i.start, i.end, i.bname, i.iname, i.rank )
             # 予約情報
-            if False:  # rsvInf:
+            
                 # 期間
                 msg += "----------\n"
                 msg += "期間：{}～{}の 予約状況\n".format( date_from.strftime("%Y-%m-%d"), date_to.strftime("%Y-%m-%d"))
                 msg += "----------\n"
                 
-                # 収集リストの表示
-                rsvInf2 = sorted( room_data, key=lambda x:(x[1],x[0]) )
-                
                 # 利用日時, 開始, 終了, 館名, 施設名, 支払状況
-                for i in rsvInf2:
+                for i in rsv_data:
+                    
                     print(i)
                     msg += "{0} {1}/{2}/{3}{4} {5}~{6} {7}/{8}({9})\n".format(
                             i.username[0:1],
                             str(i.year)[2:], i.month, i.day, i.week,  
                             i.start, i.end, i.bname, i.iname, i.rank )
             # 抽選情報
-            if False:  # lotInf:
+            if ("lot" in self.EXEC_MODE):
                 # 期間
                 msg += "----------\n"
                 msg += "期間：{}～{}の 抽選申込状況\n".format( date_from.strftime("%Y-%m-%d"), date_to.strftime("%Y-%m-%d"))
                 msg += "----------\n"
                 
                 # 収集リストの表示
-                lotInf2 = sorted( room_data, key=lambda x:(x[1],x[0]) )
-                
                 # 利用日時, 開始, 終了, 館名, 施設名, 支払状況
-                for i in lotInf2:
+                for i in lot_data:
                     print(i)
-                    msg += "{0} {1}{2}~{3} {4}/{5}({6})\n".format(
+                    msg += "{0} {1}/{2}/{3} {4}~{5} {6}/{7}({8})\n".format(
                         i.username[0:1], 
-                        i.date, i.start, i.end, 
+                        i.year, i.month, i.day, i.start, i.end, 
                         i.bname, i.iname, i.state )
 
             # 表示

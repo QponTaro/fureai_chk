@@ -17,6 +17,21 @@ def cnv_datestr( datestr ):
     datestr2 = "{:02d}/{:02d}({})".format( int(month), int(day), week)
     return datestr2
 
+def get_year( datestr ):
+    # 2019年6月8日 土曜日
+    year  = datestr[0:datestr.find("年")]
+    return int(year)
+
+def get_month( datestr ):
+    # 2019年6月8日 土曜日
+    month = datestr[datestr.find("年")+1:datestr.find("月")]
+    return int(month)
+
+def get_day( datestr ):
+    # 2019年6月8日 土曜日
+    day   = datestr[datestr.find("月")+1:datestr.find("日")]
+    return int(day)
+
 #@staticmethod
 def dates(year, month, day):
     mr = calendar.monthrange(year, month)
