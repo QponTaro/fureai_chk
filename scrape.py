@@ -726,6 +726,10 @@ class FureaiNet:
             rsv_data = list( filter( lambda x: '予約' in x[0], room_data2 ) )
             lot_data = list( filter( lambda x: '抽選' in x[0], room_data2 ) )
 
+            print(chk_data)
+            print(rsv_data)
+            print(lot_data)
+
             # ログメッセージ
             msg = ">> ふれあいネット 情報 <<\n"
             msg += "※{} 現在\n".format( today.strftime("%Y-%m-%d %H:%M:%S"))
