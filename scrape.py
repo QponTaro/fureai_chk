@@ -127,7 +127,7 @@ class FureaiNet:
                     options=options, executable_path=driver_path)
         
         else:  # PC環境 
-            options.add_argument('--headless')
+            # options.add_argument('--headless')
             self.driver = webdriver.Chrome(options=options)
 
         self.time = time
@@ -623,44 +623,25 @@ class FureaiNet:
                 # )
                 room_data.append(
                     room_datum(
-                        "空き",
-                        '---', 
-                        curYear, 
-                        curMonth,
-                        curDay, 
-                        curWeek, 
-                        'start', 
-                        'end',
-                        bname, 
-                        iname,
-                        '---', 
-                        rsvStat[0], 
-                        rsvStat[1], 
-                        rsvStat[2],
-                        rank,
+                        type = "空き検索",
+                        username = '---',  # username
+                        year = curYear,
+                        month = curMonth,
+                        day = curDay, 
+                        week = curWeek, 
+                        start = '', 
+                        end = '',
+                        bname = bname, 
+                        iname = iname,
+                        state = '---', 
+                        am = rsvStat[0], 
+                        pm = rsvStat[1], 
+                        night = rsvStat[2],
+                        rank = rank,
                         )
                     )
-                #room_data.append(
-                #    room_datum(
-                #        type = "空き検索",
-                #       username = '---',  # username
-                #        year = curYear,
-                #        month = curMonth,
-                #        day = curDay, 
-                #        week = curWeek, 
-                #        start = 'start', 
-                #        end = 'end',
-                #        bname = bname, 
-                #        iname = iname,
-                #        state = '---', 
-                #        am = rsvStat[0], 
-                #        pm = rsvStat[1], 
-                #        night = rsvStat[2],
-                #        rank = rank,
-                #        )
-                #    )
                 
-                print( room_data[-1] )
+                #print( room_data[-1] )
 
         return result_msg
 
@@ -770,6 +751,7 @@ class FureaiNet:
                                 i.username[0:1],
                                 str(i.year)[2:], i.month, i.day, i.week,  
                                 i.start, i.end, i.bname, i.iname, i.rank )
+                
             # 予約情報２
             if ("rsv" in self.EXEC_MODE):
                 # 期間
@@ -838,6 +820,7 @@ class FureaiNet:
         except Exception:
             self.logger.error(traceback.format_exc())
             print("エクセプション発生！")
+
 
         finally:
             self.driver.close()
