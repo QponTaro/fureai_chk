@@ -543,7 +543,7 @@ class FureaiNet:
         for chkbox in chkboxs:  # 3つの td で構成。0:午前, 1:午後, 2:夜
             
             chkboxicd=chkbox.get_attribute("value") 
-            print("icd:{}, chkboxicd:{}".format(icd,chkboxicd))
+            #print("icd:{}, chkboxicd:{}".format(icd,chkboxicd))
 
             if icd == chkboxicd:
                 print( bname, iname )
