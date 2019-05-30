@@ -545,6 +545,7 @@ class FureaiNet:
             chkboxicd=chkbox.get_attribute("value") 
             #print("icd:{}, chkboxicd:{}".format(icd,chkboxicd))
 
+
             if icd == chkboxicd:
                 print( bname, iname )
                 chkbox.click()
