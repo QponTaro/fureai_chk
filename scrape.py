@@ -623,7 +623,7 @@ class FureaiNet:
                 # )
                 room_data.append(
                     room_datum(
-                        type = "空き検索",
+                        type = "空き",
                         username = '---',  # username
                         year = curYear,
                         month = curMonth,
