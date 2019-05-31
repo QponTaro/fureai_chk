@@ -737,6 +737,7 @@ class FureaiNet:
             
             # 空き情報２
             if ("chk" in self.EXEC_MODE):
+                print('>chk_start')
                 # 期間
                 msg += "----------\n"
                 # msg += "期間：{}～{}\n".format( date_from.strftime("%Y-%m-%d"), date_to.strftime("%Y-%m-%d"))
@@ -756,9 +757,11 @@ class FureaiNet:
                                 i.username[0:1],
                                 str(i.year)[2:], i.month, i.day, i.week,  
                                 i.start, i.end, i.bname, i.iname, i.rank )
+                print('>chk_end')
                 
             # 予約情報２
             if ("rsv" in self.EXEC_MODE):
+                print('>rsv_start')
                 # 期間
                 msg += "----------\n"
                 msg += "よりよい会議室があれば取りたいリスト\n"
@@ -782,8 +785,11 @@ class FureaiNet:
                             i.username[0:1],
                             str(i.year)[2:], i.month, i.day, i.week,  
                             i.start, i.end, i.bname, i.iname, i.rank )
+                print('>esv_end(1)')
+                
             # 予約情報
-            
+                print('>esv_start(2)')
+                
                 # 期間
                 msg += "----------\n"
                 msg += "期間：{}～{}の 予約状況\n".format( date_from.strftime("%Y-%m-%d"), date_to.strftime("%Y-%m-%d"))
@@ -797,8 +803,11 @@ class FureaiNet:
                             i.username[0:1],
                             str(i.year)[2:], i.month, i.day, i.week,  
                             i.start, i.end, i.bname, i.iname, i.rank )
+                print('>esv_end(2)')
+                
             # 抽選情報
             if ("lot" in self.EXEC_MODE):
+                print('>lot_start')
                 # 期間
                 msg += "----------\n"
                 msg += "期間：{}～{}の 抽選申込状況\n".format( date_from.strftime("%Y-%m-%d"), date_to.strftime("%Y-%m-%d"))
@@ -812,7 +821,8 @@ class FureaiNet:
                         i.username[0:1], 
                         i.year, i.month, i.day, i.start, i.end, 
                         i.bname, i.iname, i.state )
-
+                print('>lot_end')
+                
             # 表示
             print(msg)
             self.logger.info(msg)
