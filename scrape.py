@@ -91,8 +91,10 @@ class FureaiNet:
 
         # rootロガーを取得
         self.logger = logging.getLogger()
-        self.logger.setLevel(logging.INFO)
-
+        # ログを標準出力に出力する
+        self.logger.addHandler(logging.StreamHandler(sys.stdout))
+        sself.logger.setLevel(logging.INFO)
+        
         # ファイルへ出力するハンドラーを定義
         self.today = datetime.datetime.now()
         #self.logFile = "_log\\Fureai-Net_{}.log".format( self.today.strftime("%Y%m%d_%H%M%S") )
@@ -726,9 +728,9 @@ class FureaiNet:
             rsv_data = list( filter( lambda x: '予約' in x[0], room_data2 ) )
             lot_data = list( filter( lambda x: '抽選' in x[0], room_data2 ) )
 
-            print(chk_data)
-            print(rsv_data)
-            print(lot_data)
+            #print(chk_data)
+            #print(rsv_data)
+            #print(lot_data)
 
             # ログメッセージ
             msg = ">> ふれあいネット 情報 <<\n"
