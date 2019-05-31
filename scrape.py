@@ -93,7 +93,7 @@ class FureaiNet:
         self.logger = logging.getLogger()
         # ログを標準出力に出力する
         self.logger.addHandler(logging.StreamHandler(sys.stdout))
-        sself.logger.setLevel(logging.INFO)
+        self.logger.setLevel(logging.INFO)
         
         # ファイルへ出力するハンドラーを定義
         self.today = datetime.datetime.now()
