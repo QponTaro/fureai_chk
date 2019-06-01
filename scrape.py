@@ -16,6 +16,7 @@ import logging
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
 import chromedriver_binary  # Adds chromedriver binary to path
 
 # import sys
@@ -129,9 +130,14 @@ class FureaiNet:
                     options=options, executable_path=driver_path)
         
         else:  # PC環境 
-            # options.add_argument('--headless')
+            options.add_argument('--headless')
             self.driver = webdriver.Chrome(options=options)
 
+        
+        wait=WebDriverWait(self.driver,20)
+        self.driver.implicitly_wait(30)
+
+        
         self.time = time
         self.from_time = from_time
         self.to_time = to_time
@@ -583,6 +589,10 @@ class FureaiNet:
                 day_string = str(curYear)+","+str(curMonth)+","+str(curDay)
                 script_str = "javascript:selectCalendarDate(" + \
                     day_string+");return false;"
+                
+                print('Script:'+script_str)
+
+                time.sleep(1)
                 self.driver.execute_script(script_str)
                 #print("# 日付：{0}/{1}({2}): 場所:{3}".
                 #      format(month, day, curWeek, room_str), end="")
@@ -658,7 +668,7 @@ class FureaiNet:
         msg += 'TO_ADDRESS = {}\n'.format( self.TO_ADDRESS)
         msg += 'CC_ADDRESS = {}\n'.format( self.CC_ADDRESS)
         msg += 'BCC_ADDRESS = {}\n'.format( self.BCC_ADDRESS)
-        print(msg)
+        #print(msg)
         return msg
     
     def _send_mail(self, body):
@@ -678,7 +688,7 @@ class FureaiNet:
 
     def run(self):
 
-        print('■ 現在時刻:{}'.format(self.today.hour))
+        print('■ 現在時刻:{}時'.format(self.today.hour))
         if self.isHeroku == True:
             skip_from = 0
             skip_to = 6
@@ -695,7 +705,7 @@ class FureaiNet:
 
             # メール送信パラメータチェック
             msg = self._chk_mail_parameter()
-            print(msg)
+            #print(msg)
             self.logger.info(msg)
 
             # 今日の日付を取得
