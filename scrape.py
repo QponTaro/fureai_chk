@@ -17,6 +17,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 import chromedriver_binary  # Adds chromedriver binary to path
 
 # import sys
@@ -58,7 +59,11 @@ class FureaiNet:
         env_BCC_ADDRESS = os.getenv('BCC_ADDRESS')
         env_FC_EXEC_MODE = os.getenv('FC_EXEC_MODE')
         env_MAIL_SUBJECT = os.getenv('MAIL_SUBJECT','>>ふれあいネット情報<< (Local)')
-        self.isHeroku = os.getenv('IS_HEROKU',False)
+        env_isHeroku = os.getenv('IS_HEROKU',False)
+        if env_isHeroku == 'True':
+            self.isHeroku = True
+        else:
+            self.isHeroku = False
         
         # コマンドライン引数の吸出し
         parser = argparse.ArgumentParser(description='ふれあいネットチェッカー')    # 2. パーサを作る
@@ -113,7 +118,7 @@ class FureaiNet:
         # Heroku以外ではNone
         options = Options()
         # isHeroku = os.getenv('IS_HEROKU',False)
-        if self.isHeroku == "True":
+        if self.isHeroku == True:
 
             # chromeのパスを指定する。今回は環境変数から取得
             binary_location = os.environ['CHROME_BINARY_LOCATION']
@@ -130,11 +135,11 @@ class FureaiNet:
                     options=options, executable_path=driver_path)
         
         else:  # PC環境 
-            options.add_argument('--headless')
+            #options.add_argument('--headless')
             self.driver = webdriver.Chrome(options=options)
 
         
-        wait=WebDriverWait(self.driver,20)
+        self.wait=WebDriverWait(self.driver,20)
         self.driver.implicitly_wait(30)
 
         
@@ -159,8 +164,9 @@ class FureaiNet:
         print("login: username:'{}'".format( username ))
 
         # 高機能 画面開く
-        self.driver.get(
-            "https://www.fureai-net.city.kawasaki.jp/user/view/user/homeIndex.html")
+        url = "https://www.fureai-net.city.kawasaki.jp/user/view/user/homeIndex.html"
+        self.driver.get(url)
+
         # ログインボタン押下
         # self.driver.find_element_by_id('login_on').click()
         self.driver.execute_script("javascript:return doSubmit('childForm', 'doLogin');")
@@ -488,7 +494,7 @@ class FureaiNet:
                             )
                         )
                     
-                    print( room_data[-1] )
+                    #print( room_data[-1] )
 
         return result_msg
 
@@ -505,9 +511,10 @@ class FureaiNet:
             return result_msg
 
         #  高機能画面表示
-        self.driver.get(
-            "https://www.fureai-net.city.kawasaki.jp/user/view/user/homeIndex.html")
-       
+        url = "https://www.fureai-net.city.kawasaki.jp/"
+        self.driver.get(url)
+        url = "https://www.fureai-net.city.kawasaki.jp/user/view/user/homeIndex.html"
+        self.driver.get(url)
 
         # 施設ループ
         for index, room in enumerate(dic.chorus_ROOM.keys()):
@@ -515,9 +522,24 @@ class FureaiNet:
             hmod = self.today.hour % 2
             rmod = index % 2
             print("--hmod~{}, rmod={}".format(hmod, rmod))
-            if( hmod == rmod):
+            
+            #Heroku の場合は 処理時間を短くするため 1/2 に
+            exec_flg = False
+            if self.isHeroku == False: # ローカル環境ではいつもチェック
+                exec_flg = True
+
+            if index < 1: # 麻生 と 多摩
+                exec_flg = True
+            elif ( hmod == rmod):
+                exec_flg = True
+            
+            # チェック開始
+            if exec_flg == True:
+                print("--- 実行")
                 cur_msg = self._search_free_by_room2(room, date_from, date_to)
                 result_msg += cur_msg
+            else:
+                print("--- スキップ")
 
         return result_msg
 
@@ -537,6 +559,9 @@ class FureaiNet:
             bname_key = bname+"分館"
         else:
             bname_key = bname+"市民館"
+        
+        # vvv ちょっと待ってからスクリプト実行
+        self.wait.until(EC.presence_of_element_located((By.ID, "textKeyword")))
         self.driver.find_element_by_id('textKeyword').send_keys(bname_key)
         
         self.driver.execute_script("javascript:eventOnLoad()")
@@ -586,7 +611,8 @@ class FureaiNet:
 
             # 土日祝 以外は対象外
             if curDate >= date_to:
-                #print(date_to)
+                print('▲チェックは {}/{}まで'.format(date_to.month, date_to.day))
+
             if ((curWeek == "土") or (curWeek == "日") or (curHoliday != None)):
 
                 # Webページ上の 対象施設の 日付の更新
@@ -596,7 +622,10 @@ class FureaiNet:
                 
                 print('Script:'+script_str)
 
-                time.sleep(0.5)
+                # vvv ちょっと待ってからスクリプト実行
+                #time.sleep(0.2)
+
+                self.wait.until(EC.element_to_be_clickable((By.CLASS_NAME, 'calclick')))
                 self.driver.execute_script(script_str)
                 #print("# 日付：{0}/{1}({2}): 場所:{3}".
                 #      format(month, day, curWeek, room_str), end="")
