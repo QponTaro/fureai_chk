@@ -512,8 +512,12 @@ class FureaiNet:
         # 施設ループ
         for index, room in enumerate(dic.chorus_ROOM.keys()):
             print("■ index:{0} room:{1}".format(index, room))
-            cur_msg = self._search_free_by_room2(room, date_from, date_to)
-            result_msg += cur_msg
+            hmod = self.today.hour % 2
+            rmod = index % 2
+            print("--hmod~{}, rmod={}".format(hmod, rmod))
+            if( hmod == rmod):
+                cur_msg = self._search_free_by_room2(room, date_from, date_to)
+                result_msg += cur_msg
 
         return result_msg
 
@@ -582,7 +586,7 @@ class FureaiNet:
 
             # 土日祝 以外は対象外
             if curDate >= date_to:
-                print(date_to)
+                #print(date_to)
             if ((curWeek == "土") or (curWeek == "日") or (curHoliday != None)):
 
                 # Webページ上の 対象施設の 日付の更新
@@ -592,7 +596,7 @@ class FureaiNet:
                 
                 print('Script:'+script_str)
 
-                time.sleep(1)
+                time.sleep(0.5)
                 self.driver.execute_script(script_str)
                 #print("# 日付：{0}/{1}({2}): 場所:{3}".
                 #      format(month, day, curWeek, room_str), end="")
