@@ -726,7 +726,7 @@ class FureaiNet:
             skip_from = 0
             skip_to = 6
             print('-- Heroku環境. 除外時刻:{}~{}'.format( skip_from, skip_to ))
-            if (skip_from < self.today.hour) or (self.today.hour < skip_to):
+            if (skip_from < self.today.hour) and (self.today.hour < skip_to):
                 print( '--> [SKIP]' )
                 return
 
