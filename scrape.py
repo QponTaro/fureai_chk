@@ -738,10 +738,12 @@ class FureaiNet:
 
             # 2) rsv が付いていても 間引く
             if self.today.hour in  [6, 12, 16]:
+                print('rsv 除外しない')
                 pass
             else:
-                self.EXEC_MODE.replace("rsv", "")
-
+                self.EXEC_MODE = self.EXEC_MODE.replace("rsv", "")
+                print('rsv 除外した　{}'.format(self.EXEC_MODE))
+                
 
         try:
             # dataを読み込む
