@@ -528,7 +528,7 @@ class FureaiNet:
             if self.isHeroku == False: # ローカル環境ではいつもチェック
                 exec_flg = True
 
-            if index < 1: # 麻生 と 多摩
+            if index <= 1: # 麻生 と 多摩
                 exec_flg = True
             elif ( hmod == rmod):
                 exec_flg = True
@@ -723,12 +723,25 @@ class FureaiNet:
 
         print('■ 現在時刻:{}時'.format(self.today.hour))
         if self.isHeroku == True:
+
+            # 実行時間による 処理制御
+            
+            # 1) 夜はやらない
             skip_from = 0
             skip_to = 6
             print('-- Heroku環境. 除外時刻:{}~{}'.format( skip_from, skip_to ))
             if (skip_from < self.today.hour) and (self.today.hour < skip_to):
-                print( '--> [SKIP]' )
+                print( '--> [スキップ]' )
                 return
+            else:
+                print( '--> <実行>' )
+
+            # 2) rsv が付いていても 間引く
+            if self.today.hour in  [6, 12, 16]:
+                pass
+            else:
+                self.EXEC_MODE.replace("rsv", "")
+
 
         try:
             # dataを読み込む
