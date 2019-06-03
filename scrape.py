@@ -524,7 +524,7 @@ class FureaiNet:
             print("--hmod~{}, rmod={}".format(hmod, rmod))
             
             #Heroku の場合は 処理時間を短くするため 1/2 に
-            exec_flg = False
+            exec_flg = True
             if self.isHeroku == False: # ローカル環境ではいつもチェック
                 exec_flg = True
 
@@ -592,6 +592,8 @@ class FureaiNet:
         # 施設名の取得
 
         print('■ 施設:{0}, 部屋:{1}'.format(bname, iname))
+        print('>> 期間： {0}～{1}'.format(date_from.date, date_to.date))
+        
         # room_str = '{0}/{1}'.format(bname, iname)
         rank = dic.chorus_ROOM[chorus_room]
         
