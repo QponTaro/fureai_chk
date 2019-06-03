@@ -892,7 +892,7 @@ class FureaiNet:
                 print('>lot_end')
                 
             # 表示
-            print(msg)
+            #print(msg)
             self.logger.info(msg)
             mailMsg += msg
             msg = ""
