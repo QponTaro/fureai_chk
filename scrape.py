@@ -592,7 +592,7 @@ class FureaiNet:
         # 施設名の取得
 
         print('■ 施設:{0}, 部屋:{1}'.format(bname, iname))
-        print('>> 期間： {0}～{1}'.format(date_from.date, date_to.date))
+        print('>> 期間： {0}/{1}～{2}/{3}'.format( date_from.month, date_from.day, date_to.month, date_to.day ))
         
         # room_str = '{0}/{1}'.format(bname, iname)
         rank = dic.chorus_ROOM[chorus_room]
@@ -746,6 +746,12 @@ class FureaiNet:
                 self.EXEC_MODE = self.EXEC_MODE.replace("rsv", "")
                 print('rsv 除外した　{}'.format(self.EXEC_MODE))
                 
+        # 3) 毎月 17~23日は 抽選状況チェックを追加
+        if self.today.day in [17,18,19,20,21,22,23]:
+            print('[抽選申し込み期間]')
+            self.EXEC_MODE = self.EXEC_MODE+'/lot'
+        else:
+            print('(抽選申し込み期間ではありません)')
 
         try:
             # dataを読み込む
