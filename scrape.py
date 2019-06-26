@@ -748,10 +748,16 @@ class FureaiNet:
                 
         # 3) 毎月 17~23日は 抽選状況チェックを追加
         if self.today.day in [17,18,19,20,21,22,23]:
-            print('[抽選申し込み期間]')
+            print('[抽選申込 期間]')
             self.EXEC_MODE = self.EXEC_MODE+'/lot'
+        elif self.today.day in [24]:
+            print('[抽選日]')
+            self.EXEC_MODE = self.EXEC_MODE+'/lot'    
+        elif self.today.day in [24]:
+            print('[確定 期間]')
+            self.EXEC_MODE = self.EXEC_MODE+'/lot'    
         else:
-            print('(抽選申し込み期間ではありません)')
+            print('--通常予約期間--')
 
         try:
             # dataを読み込む
@@ -772,7 +778,7 @@ class FureaiNet:
                        ).replace(day=1)
             
 
-            # 29日-30/31までは、４か月後の月末
+            # 23日-30/31までは、４か月後の月末
             # 1日～28日までは 3カ月後の月末
             if today.day >=23:
                 addMonth = 5
