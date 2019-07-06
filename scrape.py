@@ -723,20 +723,31 @@ class FureaiNet:
 
     def run(self):
 
-        print('■ 現在時刻:{}時'.format(self.today.hour))
+        print('■ 現在時刻:{}:{}'.format(self.today.hour,self.today.time))
+        
+        
+        
+        # Heroku での 現在時刻に対応した 特殊処理
         if self.isHeroku == True:
 
             # 実行時間による 処理制御
             
             # 1) 夜はやらない
-            skip_from = 0
-            skip_to = 6
-            print('-- Heroku環境. 除外時刻:{}~{}'.format( skip_from, skip_to ))
-            if (skip_from < self.today.hour) and (self.today.hour < skip_to):
-                print( '--> [スキップ]' )
-                return
+            exclude_start = 0
+            exclude_end = 6
+            exclude_flg = False
+            
+            print('-- Heroku環境. 除外時刻:{}~{}'.format( exclude_start, exclude_end ))
+            
+            if ( exclude_start < self.today.hour) and (self.today.hour <= exclude_end):
+                exclude_flg = True
+            
+            # 1) 除外条件に合致する場合は スキップ
+            if exclude_flg == True:
+                print('--> [スキップ]')
+                return  # 抜けちゃう
             else:
-                print( '--> <実行>' )
+                print('--> <実行>')
 
             # 2) rsv が付いていても 間引く
             if self.today.hour in  [6, 12, 16]:
@@ -805,19 +816,17 @@ class FureaiNet:
             #print(lot_data)
 
             # ログメッセージ
-            msg = ">> ふれあいネット 情報 <<\n"
-            msg += "※{} 現在\n".format( today.strftime("%Y-%m-%d %H:%M:%S"))
+            msg = ">> ふれあいネット <<\n"
+            msg += "※{} 現在\n".format( today.strftime("%m-%d %H:%M"))
             mailMsg = ""
             
             # 空き情報２
             if ("chk" in self.EXEC_MODE):
                 print('>chk_start')
                 # 期間
-                msg += "----------\n"
                 # msg += "期間：{}～{}\n".format( date_from.strftime("%Y-%m-%d"), date_to.strftime("%Y-%m-%d"))
                 # msg += "時間帯：午後（{}-{}時）の 空き会議室 \n".format( self.from_time, self.to_time )
-                msg += "よさそうな空き会議室リスト\n"
-                msg += "----------\n"
+                msg += "■よさそうな空き会議室\n"
                 
                 # 収集リストの表示
                 for i in chk_data:
@@ -837,10 +846,8 @@ class FureaiNet:
             if ("rsv" in self.EXEC_MODE):
                 print('>rsv_start')
                 # 期間
-                msg += "----------\n"
-                msg += "よりよい会議室があれば取りたいリスト\n"
-                msg += "----------\n"
-
+                msg += "■予約あるが取りたい\n"
+                
                 # 収集リストの表示
                 # 利用日時, 開始, 終了, 館名, 施設名, 支払状況
                 for i in rsv_data:
@@ -865,9 +872,7 @@ class FureaiNet:
                 print('>esv_start(2)')
                 
                 # 期間
-                msg += "----------\n"
-                msg += "期間：{}～{}の 予約状況\n".format( date_from.strftime("%Y-%m-%d"), date_to.strftime("%Y-%m-%d"))
-                msg += "----------\n"
+                msg += "■{}～{}の 予約状況\n".format( date_from.strftime("%Y-%m-%d"), date_to.strftime("%Y-%m-%d"))
                 
                 # 利用日時, 開始, 終了, 館名, 施設名, 支払状況
                 for i in rsv_data:
@@ -883,9 +888,7 @@ class FureaiNet:
             if ("lot" in self.EXEC_MODE):
                 print('>lot_start')
                 # 期間
-                msg += "----------\n"
-                msg += "期間：{}～{}の 抽選申込状況\n".format( date_from.strftime("%Y-%m-%d"), date_to.strftime("%Y-%m-%d"))
-                msg += "----------\n"
+                msg += "■{}～{}の 抽選申込\n".format( date_from.strftime("%Y-%m-%d"), date_to.strftime("%Y-%m-%d"))
                 
                 # 収集リストの表示
                 # 利用日時, 開始, 終了, 館名, 施設名, 支払状況
