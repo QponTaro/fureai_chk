@@ -816,8 +816,8 @@ class FureaiNet:
             #print(lot_data)
 
             # ログメッセージ
-            msg = ">> ふれあいネット <<\n"
-            msg += "※{} 現在\n".format( today.strftime("%m-%d %H:%M"))
+            # msg = ">> ふれあいネット <<\n"
+            msg = "※{} 現在\n".format( today.strftime("%m-%d %H:%M"))
             mailMsg = ""
             
             # 空き情報２
