@@ -167,9 +167,13 @@ class FureaiNet:
         url = "https://www.fureai-net.city.kawasaki.jp/user/view/user/homeIndex.html"
         self.driver.get(url)
 
+        time.sleep(1)  # 待ちを入れてみる
+
         # ログインボタン押下
         # self.driver.find_element_by_id('login_on').click()
         self.driver.execute_script("javascript:return doSubmit('childForm', 'doLogin');")
+
+        time.sleep(1)  # 待ちを入れてみる
 
         # ログイン（情報入力＆ログイン）
         userid = dic.card_ID[username]
@@ -178,6 +182,8 @@ class FureaiNet:
         self.driver.find_element_by_id('userid').send_keys(str(userid))
         self.driver.find_element_by_id('passwd').send_keys(str(passwd))
         self.driver.find_element_by_id('doLogin').click()
+
+        time.sleep(1)  # 待ちを入れてみる
 
         # 時間外チェック
         elements = self.driver.find_elements_by_id('MSG')
@@ -194,6 +200,8 @@ class FureaiNet:
         result_msg += "login OK!"
         self.login_state = True
 
+        time.sleep(1)  # 待ちを入れてみる
+
         # マイページが表示されているので
         # 予約情報を取得
         # 抽選申し込み数を取得
@@ -203,6 +211,8 @@ class FureaiNet:
             rsvCount = rsvCount_elem[0].text
             print('[施設予約 件数] {}件'.format(rsvCount))
         
+        time.sleep(1)  # 待ちを入れてみる
+
         # 抽選申し込み数を取得
         lotCount = 0
         lotCount_elem = self.driver.find_elements_by_id("lotNum")
@@ -302,6 +312,9 @@ class FureaiNet:
         # 指定された 施設 の予約状況を確認
         url = "https://www.fureai-net.city.kawasaki.jp/user/view/user/lotStatusList.html"
         self.driver.get(url)
+
+        time.sleep(1)  # 待ちを入れてみる
+
         for page_offset in range(0, int(lotCount), 5) :
 
             # 次の5件
@@ -631,6 +644,8 @@ class FureaiNet:
                 self.driver.execute_script(script_str)
                 #print("# 日付：{0}/{1}({2}): 場所:{3}".
                 #      format(month, day, curWeek, room_str), end="")
+
+                time.sleep(1)  # 待ちを入れてみる
 
                 # 予約状況の取得
                 #  class:'time-table1' は見出し行、'time-table2' は 予約状況
