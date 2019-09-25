@@ -378,7 +378,7 @@ class FureaiNet:
         elif self.today.day in [24]:
             print('[抽選日]')
             self.EXEC_MODE = self.EXEC_MODE+'/lot'
-        elif self.today.day in [24]:
+        elif self.today.day in [25,26,27,28,29]:
             print('[確定 期間]')
             self.EXEC_MODE = self.EXEC_MODE+'/lot'
         else:
