@@ -4,18 +4,18 @@ from collections import namedtuple
 
 
 # 利用日時, 開始, 終了, 館名, 施設名, 支払状況
-schedule = namedtuple('schedule', 
+schedule = namedtuple('schedule',
         (
-            'year', 
-            'month', 
-            'day', 
-            'week', 
-            'start', 
-            'end', 
-            'kind', 
-            'bname', 
-            'iname', 
-            'state', 
+            'year',
+            'month',
+            'day',
+            'week',
+            'start',
+            'end',
+            'kind',
+            'bname',
+            'iname',
+            'state',
             'rank'
         )
     )
@@ -59,28 +59,47 @@ accountInfo = namedtuple('accountInfo',
     )
 accountInf = []
 
-room_datum = namedtuple('room_datum', 
+room_datum = namedtuple('room_datum',
         (
             'type',
             'username',
-            'year', 'month', 'day', 'week', 
+            'year', 'month', 'day', 'week',
             'start','end',
-            'bname', 'iname', 
-            'state', 
+            'bname', 'iname',
+            'state',
             'am', 'pm', 'night',
-            'rank'
+            'rank',
+            'Tmanabu', 'Tsato', 'Tniimi', 'Ttamamura'
         )
     )
 room_data = []
 
+rsv_datum = namedtuple('rsv_datum',
+        (
+            'username',
+            'year', 'month', 'day','week',
+            'room',
+            'zone'
+        )
+    )
+rsv_list = []
+
+chk_datum = namedtuple('chk_datum',
+        (
+            'year', 'month', 'day','week',
+            'room',
+        )
+    )
+chk_date = []
+
 # 利用日時, 開始, 終了, 館名, 施設名, 支払状況
-#rsvInfo = namedtuple('rsvInfo', 
+#rsvInfo = namedtuple('rsvInfo',
 #    ('username','year', 'month', 'day', 'week', 'start','end','bname', 'iname', 'state','rank')
 #    )
 #rsvInf = []
 
 # 利用日時, 開始, 終了, 館名, 施設名, 支払状況
-#lotInfo = namedtuple('lotInfo', 
+#lotInfo = namedtuple('lotInfo',
 #    ('username','year', 'month', 'day', 'week', 'start','end','bname', 'iname', 'state')
 #    )
 #lotInf = []
@@ -117,8 +136,8 @@ card_PW = {
     "1270978": "9981",
 }
 chorus_TYPE = [
-    "演奏・合唱", 
-    "演奏（電気楽器不可）・合唱", 
+    "演奏・合唱",
+    "演奏（電気楽器不可）・合唱",
     "歌・演奏（小音量）"
     ]
 chorus_ID = {
@@ -182,9 +201,18 @@ sel_value_tbl = {
 }
 
 state_tbl = {
-    "受付期間外": "外",
-    "予約": "無",
     "空き": "空",
+    "予約": "無",
+    "保守日・主催事業": "保",
     "休館": "休",
-    "保守日・主催事業": "保"
+    "一般開放": "開",
+    "雨天": "雨",
+    "受付期間外": "外",
+    "取消処理中": "取",
+    "開放予定": "予",
+    "時間帯なし": "無",
+
+    "カート追加選択中": "選",
+    "カート追加済": "済",
+    "カート追加不可": "不",
 }
