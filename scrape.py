@@ -416,6 +416,12 @@ class FureaiNet:
             msg = ''
             #msg = self._first_loop( date_from, date_to )
 
+            # サービス休止時間帯は除外
+            if (today.hour >= 7)and(today.hour <= 24):
+                service_OK = True
+            else:
+                service_OK = False
+
             # 空き探索する場合
             if ("chk" in self.EXEC_MODE):
                 chk_list = make_chk_date_list()
@@ -423,11 +429,11 @@ class FureaiNet:
             #    msg += get_free_list(self, date_from, date_to)
 
             # RSV 各アカウントで収集
-            if ("rsv" in self.EXEC_MODE):
+            if ("rsv" in self.EXEC_MODE)and(service_OK):
                 msg += get_rsv_list(self)
 
            # LOT 各アカウントで収集
-            if ("lot" in self.EXEC_MODE):
+            if ("lot" in self.EXEC_MODE)and(service_OK):
                 msg += get_lot_list(self)
 
             # 予約実行 予約リストで予約
