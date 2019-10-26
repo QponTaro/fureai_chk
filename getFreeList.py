@@ -84,6 +84,8 @@ def chk_free_room(self, lst):
             iname = curRoom.split('／')[1]
             if "岡上" in bname:
                 bname_key = bname+"分館"
+            elif "サンピアン" in bname:
+                bname_key = bname
             else:
                 bname_key = bname+"市民館"
 
