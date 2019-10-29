@@ -86,6 +86,8 @@ def chk_free_room(self, lst):
                 bname_key = bname+"分館"
             elif "サンピアン" in bname:
                 bname_key = bname
+            elif "教育文化" in bname:
+                bname_key = bname
             else:
                 bname_key = bname+"市民館"
 

@@ -100,6 +100,7 @@ def _get_rsv_data( self, username ):
                 etime = etime.replace("時","")
                 bname = bname.replace("市民館","")
                 bname = bname.replace("分館","")
+                iname = iname.replace("教室","")
                 iname = iname.replace("室","")
 
                 # よりよい場所があれば... レベル
