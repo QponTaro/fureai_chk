@@ -1,5 +1,5 @@
 astroid==2.2.5
-chromedriver-binary==74.0.3729.6.0
+chromedriver-binary==78.0.3904.70.0
 colorama==0.4.1
 dateutils==0.6.6
 isort==4.3.17
