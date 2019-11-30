@@ -39,7 +39,7 @@ def make_chk_date_list():
     date_to = (today + relativedelta(months=addMonth))
 
     lst = []
-    for room in dic.chorus_ROOM.keys():
+    for room in dic.check_ROOMs:
 
         # === 日付ループ ===
         t = date_from
