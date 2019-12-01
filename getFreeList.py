@@ -18,6 +18,7 @@ import data.data as dic
 from data.data import room_data, room_datum
 from data.data import chk_date, chk_datum
 
+
 def make_chk_date_list():
 
     # 今日の日付を取得
@@ -31,11 +32,13 @@ def make_chk_date_list():
     # 23日-30/31までは、４か月後の月末
     # 1日～28日までは 3カ月後の月末
 
-    if today.day >=17:
+    if today.day >= 17:
         addMonth = 5
     else:
         addMonth = 4
 
+    # date_to = (today + relativedelta(months=addMonth)
+    #             ).replace(day=1) - datetime.timedelta(days=1)
     date_to = (today + relativedelta(months=addMonth))
 
     lst = []
@@ -45,13 +48,13 @@ def make_chk_date_list():
         t = date_from
         while t <= date_to:
 
-            curWeek    = datesub.get_weekstr( t.year, t.month, t.day )
-            curHoliday = datesub.chk_holiday( t.year, t.month, t.day )
+            curWeek = datesub.get_weekstr(t.year, t.month, t.day)
+            curHoliday = datesub.chk_holiday(t.year, t.month, t.day)
 
             # 土日祝 以外は対象外
             if ((curWeek in {"土", "日"}) or (curHoliday != None)):
 
-               lst.append(chk_datum(t.year, t.month, t.day, curWeek, room))
+                lst.append(chk_datum(t.year, t.month, t.day, curWeek, room))
 
             t += datetime.timedelta(days=1)
 
@@ -92,45 +95,47 @@ def chk_free_room(self, lst):
                 bname_key = bname+"市民館"
 
             # vvv ちょっと待ってからスクリプト実行
-            self.wait.until(EC.presence_of_element_located((By.ID, "textKeyword")))
+            self.wait.until(EC.presence_of_element_located(
+                (By.ID, "textKeyword")))
             self.driver.find_element_by_id('textKeyword').send_keys(bname_key)
 
             self.driver.execute_script("javascript:eventOnLoad()")
-            #self.driver.find_element_by_id('doSearch').submit()
+            # self.driver.find_element_by_id('doSearch').submit()
             self.driver.find_element_by_id('doSearch').click()
 
             self.driver.execute_script("javascript:eventOnLoad()")
             self.driver.find_element_by_id('doSelect').click()
-            #self.driver.execute_script( "javascript:this.form.bcd.value = '1240';return true;")
+            # self.driver.execute_script( "javascript:this.form.bcd.value = '1240';return true;")
 
             # チェックを全て解除
-            self.driver.execute_script("javascript:doCheck(false);return false;")
+            self.driver.execute_script(
+                "javascript:doCheck(false);return false;")
             # 特定の施設だけチェック
 
-            chkboxs = self.driver.find_elements_by_name('layoutChildBody:childForm:selectIcd')
+            chkboxs = self.driver.find_elements_by_name(
+                'layoutChildBody:childForm:selectIcd')
             for chkbox in chkboxs:  # チェックボックスリストの中から該当する施設だけチェックする
 
-                chkboxicd=chkbox.get_attribute("value")
-                #print("icd:{}, chkboxicd:{}".format(icd,chkboxicd))
+                chkboxicd = chkbox.get_attribute("value")
+                # print("icd:{}, chkboxicd:{}".format(icd,chkboxicd))
 
                 if icd == chkboxicd:
-                    print( bname, iname )
+                    print(bname, iname)
                     chkbox.click()
 
             # 表示の繁栄（リロード） ボタン押下
-            self.driver.find_element_by_name('layoutChildBody:childForm:doReload').click()
+            self.driver.find_element_by_name(
+                'layoutChildBody:childForm:doReload').click()
 
             # 施設名の取得
 
             print('■ 施設:{0}, 部屋:{1}'.format(bname, iname))
-            #print('>> 期間： {0}/{1}～{2}/{3}'.format( date_from.month, date_from.day, date_to.month, date_to.day ))
+            # print('>> 期間： {0}/{1}～{2}/{3}'.format( date_from.month, date_from.day, date_to.month, date_to.day ))
 
             # room_str = '{0}/{1}'.format(bname, iname)
             rank = dic.chorus_ROOM[curRoom]
 
-
         lstRoom = curRoom
-
 
         # === 日付ループ ===
 
@@ -142,11 +147,12 @@ def chk_free_room(self, lst):
         print('Script:'+script_str)
 
         # vvv ちょっと待ってからスクリプト実行
-        #time.sleep(0.2)
+        # time.sleep(0.2)
 
-        self.wait.until(EC.element_to_be_clickable((By.CLASS_NAME, 'calclick')))
+        self.wait.until(EC.element_to_be_clickable(
+            (By.CLASS_NAME, 'calclick')))
         self.driver.execute_script(script_str)
-        #print("# 日付：{0}/{1}({2}): 場所:{3}".
+        # print("# 日付：{0}/{1}({2}): 場所:{3}".
         #      format(month, day, curWeek, room_str), end="")
 
         time.sleep(0.5)  # 待ちを入れてみる
@@ -158,15 +164,15 @@ def chk_free_room(self, lst):
         for i in range(len(tds)):  # 3つの td で構成。0:午前, 1:午後, 2:夜
             td = tds[i]
             sel_ele = td.find_element_by_id("sel")
-            #bcd_ele   = td.find_element_by_id("bcd")
+            # bcd_ele   = td.find_element_by_id("bcd")
             tzone_ele = td.find_element_by_id("tzoneno")
             state_ele = td.find_element_by_tag_name("img")
 
-            #sel_name    = sel_ele.get_attribute("name")
+            # sel_name    = sel_ele.get_attribute("name")
             sel_value = sel_ele.get_attribute("value")
-            #bcd_name    = bcd_ele.get_attribute("name")
-            #bcd_value   = bcd_ele.get_attribute("value")
-            #tzone_name  = tzone_ele.get_attribute("name")
+            # bcd_name    = bcd_ele.get_attribute("name")
+            # bcd_value   = bcd_ele.get_attribute("value")
+            # tzone_name  = tzone_ele.get_attribute("name")
             tzone_value = tzone_ele.get_attribute("value")
             state_alt = state_ele.get_attribute("alt")
 
@@ -176,8 +182,8 @@ def chk_free_room(self, lst):
             rsvStat[i] = state
 
         # リストに追加
-        #room_stat.append([curYear, curMonth, curDay, curWeek, room_str, rsvStat])
-        #room_dataat = namedtuple('room_dataat', ('year', 'month', 'day', 'week', 'room', 'am', 'pm', 'night'))
+        # room_stat.append([curYear, curMonth, curDay, curWeek, room_str, rsvStat])
+        # room_dataat = namedtuple('room_dataat', ('year', 'month', 'day', 'week', 'room', 'am', 'pm', 'night'))
 
         # (
         #         'type',
@@ -191,29 +197,29 @@ def chk_free_room(self, lst):
         # )
         room_data.append(
             room_datum(
-                type = "空き",
-                username = '---',  # username
-                year = curYear,
-                month = curMonth,
-                day = curDay,
-                week = curWeek,
-                start = '',
-                end = '',
-                bname = bname,
-                iname = iname,
-                state = '---',
-                am = rsvStat[0],
-                pm = rsvStat[1],
-                night = rsvStat[2],
-                rank = rank,
-                Tmanabu = '',
-                Tsato = '',
-                Tniimi = '',
-                Ttamamura = ''
-                )
+                type="空き",
+                username='---',  # username
+                year=curYear,
+                month=curMonth,
+                day=curDay,
+                week=curWeek,
+                start='',
+                end='',
+                bname=bname,
+                iname=iname,
+                state='---',
+                am=rsvStat[0],
+                pm=rsvStat[1],
+                night=rsvStat[2],
+                rank=rank,
+                Tmanabu='',
+                Tsato='',
+                Tniimi='',
+                Ttamamura=''
             )
+        )
 
-        #print( room_data[-1] )
+        # print( room_data[-1] )
 
     return result_msg
 
@@ -236,14 +242,14 @@ def get_free_list(self, date_from, date_to):
         rmod = index % 2
         print("--hmod~{}, rmod={}".format(hmod, rmod))
 
-        #Heroku の場合は 処理時間を短くするため 1/2 に
+        # Heroku の場合は 処理時間を短くするため 1/2 に
         exec_flg = True
-        if self.isHeroku == False: # ローカル環境ではいつもチェック
+        if self.isHeroku == False:  # ローカル環境ではいつもチェック
             exec_flg = True
 
-        if index <= 1: # 麻生 と 多摩
+        if index <= 1:  # 麻生 と 多摩
             exec_flg = True
-        elif ( hmod == rmod):
+        elif (hmod == rmod):
             exec_flg = True
 
         # チェック開始
@@ -255,6 +261,7 @@ def get_free_list(self, date_from, date_to):
             print("--- スキップ")
 
     return result_msg
+
 
 def _search_free_by_room(self, curRoom, date_from, date_to):
 
@@ -278,34 +285,36 @@ def _search_free_by_room(self, curRoom, date_from, date_to):
     self.driver.find_element_by_id('textKeyword').send_keys(bname_key)
 
     self.driver.execute_script("javascript:eventOnLoad()")
-    #self.driver.find_element_by_id('doSearch').submit()
+    # self.driver.find_element_by_id('doSearch').submit()
     self.driver.find_element_by_id('doSearch').click()
 
     self.driver.execute_script("javascript:eventOnLoad()")
     self.driver.find_element_by_id('doSelect').click()
-    #self.driver.execute_script( "javascript:this.form.bcd.value = '1240';return true;")
+    # self.driver.execute_script( "javascript:this.form.bcd.value = '1240';return true;")
 
     # チェックを全て解除
     self.driver.execute_script("javascript:doCheck(false);return false;")
     # 特定の施設だけチェック
 
-    chkboxs = self.driver.find_elements_by_name('layoutChildBody:childForm:selectIcd')
+    chkboxs = self.driver.find_elements_by_name(
+        'layoutChildBody:childForm:selectIcd')
     for chkbox in chkboxs:  # 3つの td で構成。0:午前, 1:午後, 2:夜
 
-        chkboxicd=chkbox.get_attribute("value")
-        #print("icd:{}, chkboxicd:{}".format(icd,chkboxicd))
-
+        chkboxicd = chkbox.get_attribute("value")
+        # print("icd:{}, chkboxicd:{}".format(icd,chkboxicd))
 
         if icd == chkboxicd:
-            print( bname, iname )
+            print(bname, iname)
             chkbox.click()
 
-    self.driver.find_element_by_name('layoutChildBody:childForm:doReload').click()
+    self.driver.find_element_by_name(
+        'layoutChildBody:childForm:doReload').click()
 
     # 施設名の取得
 
     print('■ 施設:{0}, 部屋:{1}'.format(bname, iname))
-    print('>> 期間： {0}/{1}～{2}/{3}'.format( date_from.month, date_from.day, date_to.month, date_to.day ))
+    print('>> 期間： {0}/{1}～{2}/{3}'.format(date_from.month,
+                                          date_from.day, date_to.month, date_to.day))
 
     # room_str = '{0}/{1}'.format(bname, iname)
     rank = dic.chorus_ROOM[curRoom]
@@ -318,11 +327,11 @@ def _search_free_by_room(self, curRoom, date_from, date_to):
         # 日付の更新 とりあえず先に更新しておく
         curDate = curDate + datetime.timedelta(days=1)
 
-        curYear    = curDate.year
-        curMonth   = curDate.month
-        curDay     = curDate.day
-        curWeek    = datesub.get_weekstr( curYear, curMonth, curDay )
-        curHoliday = datesub.chk_holiday( curYear, curMonth, curDay )
+        curYear = curDate.year
+        curMonth = curDate.month
+        curDay = curDate.day
+        curWeek = datesub.get_weekstr(curYear, curMonth, curDay)
+        curHoliday = datesub.chk_holiday(curYear, curMonth, curDay)
 
         # 土日祝 以外は対象外
         if curDate >= date_to:
@@ -339,11 +348,12 @@ def _search_free_by_room(self, curRoom, date_from, date_to):
             print('Script:'+script_str)
 
             # vvv ちょっと待ってからスクリプト実行
-            #time.sleep(0.2)
+            # time.sleep(0.2)
 
-            self.wait.until(EC.element_to_be_clickable((By.CLASS_NAME, 'calclick')))
+            self.wait.until(EC.element_to_be_clickable(
+                (By.CLASS_NAME, 'calclick')))
             self.driver.execute_script(script_str)
-            #print("# 日付：{0}/{1}({2}): 場所:{3}".
+            # print("# 日付：{0}/{1}({2}): 場所:{3}".
             #      format(month, day, curWeek, room_str), end="")
 
             time.sleep(0.5)  # 待ちを入れてみる
@@ -355,15 +365,15 @@ def _search_free_by_room(self, curRoom, date_from, date_to):
             for i in range(len(tds)):  # 3つの td で構成。0:午前, 1:午後, 2:夜
                 td = tds[i]
                 sel_ele = td.find_element_by_id("sel")
-                #bcd_ele   = td.find_element_by_id("bcd")
+                # bcd_ele   = td.find_element_by_id("bcd")
                 tzone_ele = td.find_element_by_id("tzoneno")
                 state_ele = td.find_element_by_tag_name("img")
 
-                #sel_name    = sel_ele.get_attribute("name")
+                # sel_name    = sel_ele.get_attribute("name")
                 sel_value = sel_ele.get_attribute("value")
-                #bcd_name    = bcd_ele.get_attribute("name")
-                #bcd_value   = bcd_ele.get_attribute("value")
-                #tzone_name  = tzone_ele.get_attribute("name")
+                # bcd_name    = bcd_ele.get_attribute("name")
+                # bcd_value   = bcd_ele.get_attribute("value")
+                # tzone_name  = tzone_ele.get_attribute("name")
                 tzone_value = tzone_ele.get_attribute("value")
                 state_alt = state_ele.get_attribute("alt")
 
@@ -373,8 +383,8 @@ def _search_free_by_room(self, curRoom, date_from, date_to):
                 rsvStat[i] = state
 
             # リストに追加
-            #room_stat.append([curYear, curMonth, curDay, curWeek, room_str, rsvStat])
-            #room_dataat = namedtuple('room_dataat', ('year', 'month', 'day', 'week', 'room', 'am', 'pm', 'night'))
+            # room_stat.append([curYear, curMonth, curDay, curWeek, room_str, rsvStat])
+            # room_dataat = namedtuple('room_dataat', ('year', 'month', 'day', 'week', 'room', 'am', 'pm', 'night'))
 
             # (
             #         'type',
@@ -388,28 +398,28 @@ def _search_free_by_room(self, curRoom, date_from, date_to):
             # )
             room_data.append(
                 room_datum(
-                    type = "空き",
-                    username = '---',  # username
-                    year = curYear,
-                    month = curMonth,
-                    day = curDay,
-                    week = curWeek,
-                    start = '',
-                    end = '',
-                    bname = bname,
-                    iname = iname,
-                    state = '---',
-                    am = rsvStat[0],
-                    pm = rsvStat[1],
-                    night = rsvStat[2],
-                    rank = rank,
-                    Tmanabu = '',
-                    Tsato = '',
-                    Tniimi = '',
-                    Ttamamura = ''
-                    )
+                    type="空き",
+                    username='---',  # username
+                    year=curYear,
+                    month=curMonth,
+                    day=curDay,
+                    week=curWeek,
+                    start='',
+                    end='',
+                    bname=bname,
+                    iname=iname,
+                    state='---',
+                    am=rsvStat[0],
+                    pm=rsvStat[1],
+                    night=rsvStat[2],
+                    rank=rank,
+                    Tmanabu='',
+                    Tsato='',
+                    Tniimi='',
+                    Ttamamura=''
                 )
+            )
 
-            #print( room_data[-1] )
+            # print( room_data[-1] )
 
     return result_msg

@@ -257,54 +257,6 @@ class FureaiNet:
 
         return result_msg
 
-
-    # 第１ループ
-    def _first_loop( self, date_from, date_to ):
-        result_msg = ""
-
-        # 空き探索する場合
-        if ("chk" in self.EXEC_MODE):
-            print('0:空きサーチ2\n')
-            #result_msg += self._get_free_room2( date_from, date_to )
-
-        # Reserve 各アカウントで収集
-        if False:
-        #if ("rsv" in self.EXEC_MODE):
-            for login_name in dic.card_ID:
-                print('アカウント:{}'.format(login_name))
-                result_msg += self._login( login_name )
-
-                # ログインできなかったら コンティニュー
-                if self.login_state == False:
-                    continue
-
-                # 予約サーチする場合
-                print('1:予約サーチ({})\n'.format(login_name))
-                #result_msg += self._get_reserve_list( login_name )
-
-                # 最後にログオフ
-                result_msg += self._logoff()
-
-        # LOT 各アカウントで収集
-        if False:
-        # if ("lot" in self.EXEC_MODE):
-            for login_name in dic.card_ID:
-                print('アカウント:{}'.format(login_name))
-                result_msg += self._login( login_name )
-
-                # ログインできなかったら コンティニュー
-                if self.login_state == False:
-                    continue
-
-                # 抽選結果確認する場合
-                print('3:抽選サーチ({})\n'.format(login_name))
-                #result_msg += self._get_lot_list( login_name )
-
-                # 最後にログオフ
-                result_msg += self._logoff()
-
-        return result_msg
-
     def _chk_mail_parameter(self):
         msg = '--- Mail Send Parameter ---\n'
         msg += 'SMTP_USER = {}\n'.format( self.SMTP_USER )
@@ -335,36 +287,25 @@ class FureaiNet:
 
         print('■ 現在時刻:{}:{}'.format(self.today.hour,self.today.time))
 
-
-
-        # Heroku での 現在時刻に対応した 特殊処理
+        # Heroku での 特殊処理
         if self.isHeroku == True:
+            print('■ Exec on Heroku ■')
 
             # =========================================
             # >>>> ここは Heroku の特殊処理 >>>>
             # =========================================
 
-            # 実行時間による 処理制御
+            # 1) 時間帯による処理
+                # 通常の処理でも判断するので特別な処理はなし
+                # と思ったけど やる。
+                # Herokuでは 毎時 起動される。
+                # なので 時間で除外しないと 無意味な処理が何度も走る
+                # サービス休止時間帯は除外
+            if (self.today.hour < 7)or(self.today.hour > 24):
+                return
 
-            # 1) 夜はやらない
-            exclude_start = 0
-            exclude_end = 6
-            exclude_flg = False
-
-            print('-- Heroku環境. 除外時刻:{}~{}'.format( exclude_start, exclude_end ))
-
-            if ( exclude_start < self.today.hour) and (self.today.hour <= exclude_end):
-                exclude_flg = True
-
-            # 1) 除外条件に合致する場合は スキップ
-            if exclude_flg == True:
-                print('--> [スキップ]')
-                return  # 抜けちゃう
-            else:
-                print('--> <実行>')
-
-            # 2) rsv が付いていても 間引く
-            if self.today.hour in  [6, 12, 16]:
+            # １) rsv が付いていても 間引く
+            if self.today.hour in  [6, 9, 12, 15, 18]:
                 print('rsv 除外しない')
                 pass
             else:
@@ -389,32 +330,18 @@ class FureaiNet:
             FCHK_DATA = "data/fchk_data.csv"
             # rw_csv.read_data( FCHK_DATA, data.room_data )
 
-
             # メール送信パラメータチェック
             msg = self._chk_mail_parameter()
+
             #print(msg)
             self.logger.info(msg)
 
             # 今日の日付を取得
             today = datetime.datetime.now()
 
-            # 開始日は今日の翌々月1日
-            date_from = (today + relativedelta(months=2)
-                       ).replace(day=1)
-
-
-            # 23日-30/31までは、４か月後の月末
-            # 1日～28日までは 3カ月後の月末
-            if today.day >=17:
-                addMonth = 5
-            else:
-                addMonth = 4
-            date_to = (today + relativedelta(months=addMonth)
-                       ).replace(day=1) - datetime.timedelta(days=1)
 
             # 取得開始
             msg = ''
-            #msg = self._first_loop( date_from, date_to )
 
             # サービス休止時間帯は除外
             if (today.hour >= 7)and(today.hour <= 24):
@@ -422,25 +349,27 @@ class FureaiNet:
             else:
                 service_OK = False
 
-            # 空き探索する場合
+            # 空き探索する場合  ※これはサービス休止中でも可能
             if ("chk" in self.EXEC_MODE):
                 chk_list = make_chk_date_list()
                 msg += chk_free_room(self,chk_list)
             #    msg += get_free_list(self, date_from, date_to)
 
-            # RSV 各アカウントで収集
-            if ("rsv" in self.EXEC_MODE)and(service_OK):
-                msg += get_rsv_list(self)
+            # これ以降の確認は サービス時間でないと 実行できない
+            if service_OK:
+                # RSV 各アカウントで収集
+                if ("rsv" in self.EXEC_MODE):
+                    msg += get_rsv_list(self)
 
-           # LOT 各アカウントで収集
-            if ("lot" in self.EXEC_MODE)and(service_OK):
-                msg += get_lot_list(self)
+                # LOT 各アカウントで収集
+                if ("lot" in self.EXEC_MODE):
+                    msg += get_lot_list(self)
 
-            # 予約実行 予約リストで予約
-            if ("dorsv" in self.EXEC_MODE):
-                rsv_list.append(rsv_datum('歌の会', '2019', '11', '15', '', '麻生／視聴覚', '午後'))
-                rsv_list.append(rsv_datum('歌の会', '2019', '12', '15', '', '高津／第２音楽', '午後'))
-                msg = reserve_room(self, rsv_list)
+                # 予約実行 予約リストで予約
+                if ("dorsv" in self.EXEC_MODE):
+                    rsv_list.append(rsv_datum('歌の会', '2019', '11', '15', '', '麻生／視聴覚', '午後'))
+                    rsv_list.append(rsv_datum('歌の会', '2019', '12', '15', '', '高津／第２音楽', '午後'))
+                    msg = reserve_room(self, rsv_list)
 
             # =================================
             #   データ前処理
@@ -524,7 +453,9 @@ class FureaiNet:
 
                 # 収集リストの表示
                 # 期間
-                msg += "■ 予約済 {}～{}\n".format( date_from.strftime("%m/%d"), date_to.strftime("%m/%d"))
+                ## msg += "■ 予約済 {}～{}\n".format(date_from.strftime("%m/%d"),
+                ##                              date_to.strftime("%m/%d"))
+                msg += "■ 予約済\n"
 
                 # 利用日時, 開始, 終了, 館名, 施設名, 支払状況
                 for i in rsv_data:
@@ -541,7 +472,9 @@ class FureaiNet:
             if ("lot" in self.EXEC_MODE):
                 print('>lot_start')
                 # 期間
-                msg += "■ 抽選申込 {}～{}\n".format( date_from.strftime("%m-%d"), date_to.strftime("%m-%d"))
+                ## msg += "■ 抽選申込 {}～{}\n".format(
+                ##     date_from.strftime("%m-%d"), date_to.strftime("%m-%d"))
+                msg += "■ 抽選申込\n"
 
                 # 収集リストの表示
                 # 利用日時, 開始, 終了, 館名, 施設名, 支払状況
