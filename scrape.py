@@ -304,8 +304,8 @@ class FureaiNet:
             if (self.today.hour < 7)or(self.today.hour > 24):
                 return
 
-            # １) rsv が付いていても 間引く
-            if self.today.hour in  [6, 9, 12, 15, 18]:
+            # １) rsv が付いていても 間引く ※間引かない時間を指定する
+            if self.today.hour in  [6, 9, 12, 15, 18, 21, 24, 0]:
                 print('rsv 除外しない')
                 pass
             else:
@@ -319,7 +319,7 @@ class FureaiNet:
         elif self.today.day in [24]:
             print('[抽選日]')
             self.EXEC_MODE = self.EXEC_MODE+'/lot'
-        elif self.today.day in [25,26,27,28,29]:
+        elif self.today.day in [25,26,27,28,29,30,31,1,2,3,4]:
             print('[確定 期間]')
             self.EXEC_MODE = self.EXEC_MODE+'/lot'
         else:
