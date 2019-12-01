@@ -155,7 +155,7 @@ def chk_free_room(self, lst):
         # print("# 日付：{0}/{1}({2}): 場所:{3}".
         #      format(month, day, curWeek, room_str), end="")
 
-        time.sleep(0.5)  # 待ちを入れてみる
+        time.sleep(0.3)  # 待ちを入れてみる
 
         # 予約状況の取得
         #  class:'time-table1' は見出し行、'time-table2' は 予約状況
@@ -356,7 +356,7 @@ def _search_free_by_room(self, curRoom, date_from, date_to):
             # print("# 日付：{0}/{1}({2}): 場所:{3}".
             #      format(month, day, curWeek, room_str), end="")
 
-            time.sleep(0.5)  # 待ちを入れてみる
+            time.sleep(0.3)  # 待ちを入れてみる
 
             # 予約状況の取得
             #  class:'time-table1' は見出し行、'time-table2' は 予約状況
