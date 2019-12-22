@@ -4,11 +4,11 @@ import datetime
 from dateutil.relativedelta import relativedelta
 
 # WebDriver系
-from selenium import webdriver
+# from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
+# from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-import chromedriver_binary  # Adds chromedriver binary to path
+# import chromedriver_binary  # Adds chromedriver binary to path
 
 import subs.datesub as datesub
 
@@ -52,7 +52,7 @@ def make_chk_date_list():
             curHoliday = datesub.chk_holiday(t.year, t.month, t.day)
 
             # 土日祝 以外は対象外
-            if ((curWeek in {"土", "日"}) or (curHoliday != None)):
+            if ((curWeek in {"土", "日"}) or (curHoliday is not None)):
 
                 lst.append(chk_datum(t.year, t.month, t.day, curWeek, room))
 
@@ -86,13 +86,13 @@ def chk_free_room(self, lst):
             bname = curRoom.split('／')[0]
             iname = curRoom.split('／')[1]
             if "岡上" in bname:
-                bname_key = bname+"分館"
+                bname_key = bname + "分館"
             elif "サンピアン" in bname:
                 bname_key = bname
             elif "教育文化" in bname:
                 bname_key = bname
             else:
-                bname_key = bname+"市民館"
+                bname_key = bname + "市民館"
 
             # vvv ちょっと待ってからスクリプト実行
             self.wait.until(EC.presence_of_element_located(
@@ -140,11 +140,11 @@ def chk_free_room(self, lst):
         # === 日付ループ ===
 
         # Webページ上の 対象施設の 日付の更新
-        day_string = str(curYear)+","+str(curMonth)+","+str(curDay)
+        day_string = str(curYear) + "," + str(curMonth) + "," + str(curDay)
         script_str = "javascript:selectCalendarDate(" + \
-            day_string+");return false;"
+            day_string + ");return false;"
 
-        print('Script:'+script_str)
+        print('Script:' + script_str)
 
         # vvv ちょっと待ってからスクリプト実行
         # time.sleep(0.2)
@@ -253,7 +253,7 @@ def get_free_list(self, date_from, date_to):
             exec_flg = True
 
         # チェック開始
-        if exec_flg == True:
+        if exec_flg:
             print("--- 実行")
             cur_msg = _search_free_by_room(self, room, date_from, date_to)
             result_msg += cur_msg
@@ -276,9 +276,9 @@ def _search_free_by_room(self, curRoom, date_from, date_to):
     bname = curRoom.split('／')[0]
     iname = curRoom.split('／')[1]
     if "岡上" in bname:
-        bname_key = bname+"分館"
+        bname_key = bname + "分館"
     else:
-        bname_key = bname+"市民館"
+        bname_key = bname + "市民館"
 
     # vvv ちょっと待ってからスクリプト実行
     self.wait.until(EC.presence_of_element_located((By.ID, "textKeyword")))
@@ -321,7 +321,7 @@ def _search_free_by_room(self, curRoom, date_from, date_to):
 
     # === 日付ループ ===
     curDate = date_from
-    days = (date_to-date_from).days
+    days = (date_to - date_from).days
     for dayCnt in range(days):  # 200日間チェック
 
         # 日付の更新 とりあえず先に更新しておく
@@ -338,14 +338,14 @@ def _search_free_by_room(self, curRoom, date_from, date_to):
             print('▲チェックは {}/{}まで'.format(date_to.month, date_to.day))
 
         # if ((curWeek == "土") or (curWeek == "日") or (curHoliday != None)):
-        if ((curWeek in {"土", "日"}) or (curHoliday != None)):
+        if ((curWeek in {"土", "日"}) or (curHoliday is not None)):
 
             # Webページ上の 対象施設の 日付の更新
-            day_string = str(curYear)+","+str(curMonth)+","+str(curDay)
+            day_string = str(curYear) + "," + str(curMonth) + "," + str(curDay)
             script_str = "javascript:selectCalendarDate(" + \
-                day_string+");return false;"
+                day_string + ");return false;"
 
-            print('Script:'+script_str)
+            print('Script:' + script_str)
 
             # vvv ちょっと待ってからスクリプト実行
             # time.sleep(0.2)

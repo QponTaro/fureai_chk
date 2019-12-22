@@ -2,52 +2,59 @@
 from collections import namedtuple
 
 
-
 # 利用日時, 開始, 終了, 館名, 施設名, 支払状況
 schedule = namedtuple('schedule',
-        (
-            'year',
-            'month',
-            'day',
-            'week',
-            'start',
-            'end',
-            'kind',
-            'bname',
-            'iname',
-            'state',
-            'rank'
-        )
-    )
+                      (
+                          'year',
+                          'month',
+                          'day',
+                          'week',
+                          'start',
+                          'end',
+                          'kind',
+                          'bname',
+                          'iname',
+                          'state',
+                          'rank'
+                      )
+                      )
 
 scheduleList = []
-scheduleList.append( schedule('2019','4','27','土','13','17','練習','麻生','視聴覚室', '確定', '◎' ) )
-scheduleList.append( schedule('2019','5','11','土','13','17','練習','多摩','視聴覚室', '確定', '◎' ) )
-scheduleList.append( schedule('2019','5','19','日','13','17','練習','高津','第１音楽室', '確定', '◎' ) )
-scheduleList.append( schedule('2019','6','15','土','13','17','練習','麻生','視聴覚室', '確定', '◎' ) )
-scheduleList.append( schedule('2019','6','23','日','13','17','練習','多摩','視聴覚室', '確定', '◎' ) )
-scheduleList.append( schedule('2019','6','2','日','13','17','全体ヴォイトレ','中原','音楽室', '確定', '◎' ) )
-scheduleList.append( schedule('2019','4','28','土','13','17','ヴォイトレ','多摩','視聴覚室', '確定', '◎' ) )
-scheduleList.append( schedule('2019','5','6','土','13','17','ヴォイトレ','多摩','視聴覚室', '確定', '◎' ) )
+scheduleList.append(schedule('2019', '4', '27', '土', '13',
+                             '17', '練習', '麻生', '視聴覚室', '確定', '◎'))
+scheduleList.append(schedule('2019', '5', '11', '土', '13',
+                             '17', '練習', '多摩', '視聴覚室', '確定', '◎'))
+scheduleList.append(schedule('2019', '5', '19', '日', '13',
+                             '17', '練習', '高津', '第１音楽室', '確定', '◎'))
+scheduleList.append(schedule('2019', '6', '15', '土', '13',
+                             '17', '練習', '麻生', '視聴覚室', '確定', '◎'))
+scheduleList.append(schedule('2019', '6', '23', '日', '13',
+                             '17', '練習', '多摩', '視聴覚室', '確定', '◎'))
+scheduleList.append(schedule('2019', '6', '2', '日', '13',
+                             '17', '全体ヴォイトレ', '中原', '音楽室', '確定', '◎'))
+scheduleList.append(schedule('2019', '4', '28', '土', '13',
+                             '17', 'ヴォイトレ', '多摩', '視聴覚室', '確定', '◎'))
+scheduleList.append(schedule('2019', '5', '6', '土', '13',
+                             '17', 'ヴォイトレ', '多摩', '視聴覚室', '確定', '◎'))
 
 
-#練習日
-#4/27（土）麻生市民館視聴覚室　午後　新美先生
-#5/11（土）多摩市民館視聴覚室　午後　佐藤先生
-#5/19（日）高津市民館第一音楽室　午後　新美先生
-#6/15（土）麻生市民館視聴覚室　午後　新美先生
-#6/23（日）多摩市民館視聴覚室　午後　佐藤先生
+# 練習日
+# 4/27（土）麻生市民館視聴覚室　午後　新美先生
+# 5/11（土）多摩市民館視聴覚室　午後　佐藤先生
+# 5/19（日）高津市民館第一音楽室　午後　新美先生
+# 6/15（土）麻生市民館視聴覚室　午後　新美先生
+# 6/23（日）多摩市民館視聴覚室　午後　佐藤先生
 #
-#全体ヴォイトレ
-#6/2（日）中原市民館音楽室　午後　玉村・佐藤先生
+# 全体ヴォイトレ
+# 6/2（日）中原市民館音楽室　午後　玉村・佐藤先生
 #
-#個人ヴォイトレ
-#4/28（日）多摩市民館視聴覚室　午後
-#5/6（月）多摩市民館視聴覚室　午後
+# 個人ヴォイトレ
+# 4/28（日）多摩市民館視聴覚室　午後
+# 5/6（月）多摩市民館視聴覚室　午後
 
-def chk_schedule( year, month, day ):
+def chk_schedule(year, month, day):
     for sc in scheduleList:
-        if( sc.year == year) and ( sc.month == month) and (sc.day == day):
+        if(sc.year == year) and (sc.month == month) and (sc.day == day):
             return sc
         else:
             return None
@@ -55,54 +62,54 @@ def chk_schedule( year, month, day ):
 
 # アカウント情報
 accountInfo = namedtuple('accountInfo',
-        ('username','userid','passwd','rsvCount','lotCount')
-    )
+                         ('username', 'userid', 'passwd', 'rsvCount', 'lotCount')
+                         )
 accountInf = []
 
 room_datum = namedtuple('room_datum',
-        (
-            'type',
-            'username',
-            'year', 'month', 'day', 'week',
-            'start','end',
-            'bname', 'iname',
-            'state',
-            'am', 'pm', 'night',
-            'rank',
-            'Tmanabu', 'Tsato', 'Tniimi', 'Ttamamura'
-        )
-    )
+                        (
+                            'type',
+                            'username',
+                            'year', 'month', 'day', 'week',
+                            'start', 'end',
+                            'bname', 'iname',
+                            'state',
+                            'am', 'pm', 'night',
+                            'rank',
+                            'Tmanabu', 'Tsato', 'Tniimi', 'Ttamamura'
+                        )
+                        )
 room_data = []
 
 rsv_datum = namedtuple('rsv_datum',
-        (
-            'username',
-            'year', 'month', 'day','week',
-            'room',
-            'zone'
-        )
-    )
+                       (
+                           'username',
+                           'year', 'month', 'day', 'week',
+                           'room',
+                           'zone'
+                       )
+                       )
 rsv_list = []
 
 chk_datum = namedtuple('chk_datum',
-        (
-            'year', 'month', 'day','week',
-            'room',
-        )
-    )
+                       (
+                           'year', 'month', 'day', 'week',
+                           'room',
+                       )
+                       )
 chk_date = []
 
 # 利用日時, 開始, 終了, 館名, 施設名, 支払状況
-#rsvInfo = namedtuple('rsvInfo',
+# rsvInfo = namedtuple('rsvInfo',
 #    ('username','year', 'month', 'day', 'week', 'start','end','bname', 'iname', 'state','rank')
 #    )
-#rsvInf = []
+# rsvInf = []
 
 # 利用日時, 開始, 終了, 館名, 施設名, 支払状況
-#lotInfo = namedtuple('lotInfo',
+# lotInfo = namedtuple('lotInfo',
 #    ('username','year', 'month', 'day', 'week', 'start','end','bname', 'iname', 'state')
 #    )
-#lotInf = []
+# lotInf = []
 
 
 # room_stat = [ ["Year", "Month", "Day", "Week", "room", ["AM", "PM", "Night"] ] ]
@@ -115,19 +122,19 @@ card_ID = {
     "歌の会": "5040302",
     "ハワイアン": "5106148",
     "ソレイユ": "5053167",
-#    "高橋良": "1270978",
+    #    "高橋良": "1270978",
 }
 card_RSV = {
     "歌の会": 0,
     "ハワイアン": 0,
     "ソレイユ": 0,
-#    "高橋良": 0,
+    #    "高橋良": 0,
 }
 card_LOT = {
     "歌の会": 0,
     "ハワイアン": 0,
     "ソレイユ": 0,
-#    "高橋良 ": 0,
+    #    "高橋良 ": 0,
 }
 card_PW = {
     "5040302": "1950",
@@ -139,12 +146,12 @@ chorus_TYPE = [
     "演奏・合唱",
     "演奏（電気楽器不可）・合唱",
     "歌・演奏（小音量）"
-    ]
+]
 chorus_ID = {
     "演奏・合唱": "2-210-210010",
     "演奏（電気楽器不可）・合唱": "2-210-210020",
     "歌・演奏（小音量）": "2-210-210030"
-    }
+}
 
 room_bcd = {
     "中原／音楽": "1180",
@@ -189,24 +196,24 @@ check_ROOMs = [
     "高津／視聴覚",
     "中原／視聴覚",
 
-#    "宮前／視聴覚",
-#    "岡上／集会",
+    "宮前／視聴覚",
+    "岡上／集会",
 ]
 
 # 参照用 施設リスト
 chorus_ROOM = {
-    "麻生／視聴覚":"◎",
-    "多摩／視聴覚":"◎",
+    "麻生／視聴覚": "◎",
+    "多摩／視聴覚": "◎",
 
-    "中原／音楽":"〇",
-    "高津／第１音楽":"〇",
+    "中原／音楽": "〇",
+    "高津／第１音楽": "〇",
 
-    "高津／視聴覚":"△",
-    "中原／視聴覚":"△",
-    "宮前／視聴覚":"△",
-    "岡上／集会":"△",
+    "高津／視聴覚": "△",
+    "中原／視聴覚": "△",
+    "宮前／視聴覚": "△",
+    "岡上／集会": "△",
 
-    "高津／第２音楽":"◆",
+    "高津／第２音楽": "◆",
     "麻生／大会議": "？",
     "サンピアンかわさき／音楽": "★",
     "教育文化会館／視聴覚": "★",
