@@ -1,9 +1,9 @@
 # 日付操作系 ライブラリ
 import sys  # main.py で必要
 import datetime
-import calendar
-import jpholiday
-from dateutil.relativedelta import relativedelta
+# import calendar
+# import jpholiday
+# from dateutil.relativedelta import relativedelta
 import time
 
 # 環境変数取得のため
@@ -16,10 +16,10 @@ import logging
 # WebDriver系
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
+# from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-import chromedriver_binary  # Adds chromedriver binary to path
+# from selenium.webdriver.support import expected_conditions as EC
+# import chromedriver_binary  # Adds chromedriver binary to path
 
 # import sys
 # from pathlib import Path
@@ -34,17 +34,18 @@ import argparse    # 1. argparseをインポート
 # from email.mime.text import MIMEText
 # import smtplib
 import sendMail.sendMail as sendMail  # 自前
-import subs.datesub as datesub
+# import subs.datesub as datesub
 
 # import printLogInfo # 自前
 
 # 名前付きタプル
-from collections import namedtuple
+# from collections import namedtuple
 
 # data, 辞書 インポート
 import data.data as data
 import data.data as dic
-from data.data import room_data, room_datum
+from data.data import room_data
+# from data.data import room_datum
 from data.data import rsv_list, rsv_datum
 
 import data.rw_csv as rw_csv
@@ -52,7 +53,8 @@ import data.rw_csv as rw_csv
 
 from getLotList import get_lot_list
 from getRsvList import get_rsv_list
-from getFreeList import get_free_list, make_chk_date_list, chk_free_room
+# from getFreeList import get_free_list
+from getFreeList import make_chk_date_list, chk_free_room
 
 from reserve import reserve_room
 
