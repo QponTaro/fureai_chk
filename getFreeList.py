@@ -13,10 +13,11 @@ from selenium.webdriver.support import expected_conditions as EC
 import subs.datesub as datesub
 
 # data, 辞書 インポート
-import data.data as data
+# import data.data as data
 import data.data as dic
 from data.data import room_data, room_datum
-from data.data import chk_date, chk_datum
+from data.data import chk_datum
+# from data.data import chk_date, chk_datum
 
 
 def make_chk_date_list():
@@ -59,6 +60,8 @@ def make_chk_date_list():
             t += datetime.timedelta(days=1)
 
     return lst
+
+# 今使っている関数
 
 
 def chk_free_room(self, lst):
@@ -155,7 +158,7 @@ def chk_free_room(self, lst):
         # print("# 日付：{0}/{1}({2}): 場所:{3}".
         #      format(month, day, curWeek, room_str), end="")
 
-        time.sleep(0.3)  # 待ちを入れてみる
+        time.sleep(0.2)  # 待ちを入れてみる
 
         # 予約状況の取得
         #  class:'time-table1' は見出し行、'time-table2' は 予約状況
@@ -163,21 +166,21 @@ def chk_free_room(self, lst):
         tds = self.driver.find_elements_by_class_name('time-table2')
         for i in range(len(tds)):  # 3つの td で構成。0:午前, 1:午後, 2:夜
             td = tds[i]
-            sel_ele = td.find_element_by_id("sel")
+            # sel_ele = td.find_element_by_id("sel")
             # bcd_ele   = td.find_element_by_id("bcd")
-            tzone_ele = td.find_element_by_id("tzoneno")
+            # tzone_ele = td.find_element_by_id("tzoneno")
             state_ele = td.find_element_by_tag_name("img")
 
             # sel_name    = sel_ele.get_attribute("name")
-            sel_value = sel_ele.get_attribute("value")
+            # sel_value = sel_ele.get_attribute("value")
             # bcd_name    = bcd_ele.get_attribute("name")
             # bcd_value   = bcd_ele.get_attribute("value")
             # tzone_name  = tzone_ele.get_attribute("name")
-            tzone_value = tzone_ele.get_attribute("value")
+            # tzone_value = tzone_ele.get_attribute("value")
             state_alt = state_ele.get_attribute("alt")
 
             state = dic.state_tbl[state_alt]
-            tzone_str = dic.tzone_tbl[tzone_value]
+            # tzone_str = dic.tzone_tbl[tzone_value]
             # rsvStat[i] = sel_value
             rsvStat[i] = state
 
@@ -244,7 +247,7 @@ def get_free_list(self, date_from, date_to):
 
         # Heroku の場合は 処理時間を短くするため 1/2 に
         exec_flg = True
-        if self.isHeroku == False:  # ローカル環境ではいつもチェック
+        if self.isHeroku is False:  # ローカル環境ではいつもチェック
             exec_flg = True
 
         if index <= 1:  # 麻生 と 多摩
@@ -356,7 +359,7 @@ def _search_free_by_room(self, curRoom, date_from, date_to):
             # print("# 日付：{0}/{1}({2}): 場所:{3}".
             #      format(month, day, curWeek, room_str), end="")
 
-            time.sleep(0.3)  # 待ちを入れてみる
+            time.sleep(0.2)  # 待ちを入れてみる
 
             # 予約状況の取得
             #  class:'time-table1' は見出し行、'time-table2' は 予約状況
@@ -364,21 +367,21 @@ def _search_free_by_room(self, curRoom, date_from, date_to):
             tds = self.driver.find_elements_by_class_name('time-table2')
             for i in range(len(tds)):  # 3つの td で構成。0:午前, 1:午後, 2:夜
                 td = tds[i]
-                sel_ele = td.find_element_by_id("sel")
+                # sel_ele = td.find_element_by_id("sel")
                 # bcd_ele   = td.find_element_by_id("bcd")
-                tzone_ele = td.find_element_by_id("tzoneno")
+                # tzone_ele = td.find_element_by_id("tzoneno")
                 state_ele = td.find_element_by_tag_name("img")
 
                 # sel_name    = sel_ele.get_attribute("name")
-                sel_value = sel_ele.get_attribute("value")
+                # sel_value = sel_ele.get_attribute("value")
                 # bcd_name    = bcd_ele.get_attribute("name")
                 # bcd_value   = bcd_ele.get_attribute("value")
                 # tzone_name  = tzone_ele.get_attribute("name")
-                tzone_value = tzone_ele.get_attribute("value")
+                # tzone_value = tzone_ele.get_attribute("value")
                 state_alt = state_ele.get_attribute("alt")
 
                 state = dic.state_tbl[state_alt]
-                tzone_str = dic.tzone_tbl[tzone_value]
+                # tzone_str = dic.tzone_tbl[tzone_value]
                 # rsvStat[i] = sel_value
                 rsvStat[i] = state
 

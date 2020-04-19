@@ -388,7 +388,7 @@ class FureaiNet:
             rsv_data = list(filter(lambda x: '予約' in x[0], room_data2))
             lot_data = list(filter(lambda x: '抽選' in x[0], room_data2))
 
-            chk_data2 = list(filter(lambda x: (x.pm in {'0', '空'}) and (x.rank in {'〇', '◎', '◆'}), chk_data))
+            chk_data2 = list(filter(lambda x: (x.pm in {'0', '空'}) and (x.rank in {'〇', '◎', '◆', '△'}), chk_data))
             rsv_data2 = list(filter(lambda x: (x.rank in {"〇", "△", "◆"}), rsv_data))
 
             # ログメッセージ

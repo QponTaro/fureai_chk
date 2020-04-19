@@ -1,17 +1,17 @@
 # 日付操作系 ライブラリ
-import time
+# import time
 
 # WebDriver系
-from selenium import webdriver
+# from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-import chromedriver_binary  # Adds chromedriver binary to path
+# from selenium.webdriver.support.ui import WebDriverWait
+# from selenium.webdriver.support import expected_conditions as EC
+# import chromedriver_binary  # Adds chromedriver binary to path
 
 import subs.datesub as datesub
 
 # data, 辞書 インポート
-import data.data as data
+# import data.data as data
 import data.data as dic
 from data.data import room_data, room_datum
 
@@ -114,10 +114,10 @@ def _get_rsv_data(self, username):
                 print("日時：{}[{}~{}], 施設:{}/{}, 支払:{}".format(ymd, stime, etime, bname, iname, state))
 
                 # リストに追加
-                #room_stat.append([curYear, curMonth, curDay, curWeek, room_str, rsvStat])
-                #room_dataat = namedtuple('room_dataat', ('year', 'month', 'day', 'week', 'room', 'am', 'pm', 'night'))
+                # room_stat.append([curYear, curMonth, curDay, curWeek, room_str, rsvStat])
+                # room_dataat = namedtuple('room_dataat', ('year', 'month', 'day', 'week', 'room', 'am', 'pm', 'night'))
 
-                #('username','year', 'month', 'day', 'week', 'start','end','bname', 'iname', 'am', 'pm', 'night','rank')
+                # ('username','year', 'month', 'day', 'week', 'start','end','bname', 'iname', 'am', 'pm', 'night','rank')
                 room_data.append(
                     room_datum(
                         type='予約',
@@ -142,6 +142,6 @@ def _get_rsv_data(self, username):
                     )
                 )
 
-                #print( room_data[-1] )
+                # print( room_data[-1] )
 
     return result_msg
