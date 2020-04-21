@@ -40,14 +40,18 @@ def make_chk_date_list():
     # 23日-30/31までは、４か月後の月末
     # 1日～28日までは 3カ月後の月末
 
-    if today.day >= 17:
-        addMonth = 5
-    else:
+    if today.day >= 16:  # 今日が 16日～月末
         addMonth = 4
+    else:                # 今日は 1~15日
+        addMonth = 3
 
     # date_to = (today + relativedelta(months=addMonth)
     #             ).replace(day=1) - datetime.timedelta(days=1)
-    date_to = (today + relativedelta(months=addMonth))
+    # dt = date.today() + relativedelta(years=1, months=1, day=1, days=-1)
+    date_to = today + relativedelta(months=addMonth + 1, day=1, days=-1)
+    # date_to = (today + relativedelta(months=addMonth))
+
+    print('chk {} ~ {}'.format(date_from, date_to))
 
     lst = []
     for room in dic.check_ROOMs:
