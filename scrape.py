@@ -19,7 +19,7 @@ from selenium.webdriver.chrome.options import Options
 # from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 # from selenium.webdriver.support import expected_conditions as EC
-# import chromedriver_binary  # Adds chromedriver binary to path
+import chromedriver_binary  # Adds chromedriver binary to path
 
 # import sys
 # from pathlib import Path
@@ -54,7 +54,8 @@ import data.rw_csv as rw_csv
 from getLotList import get_lot_list
 from getRsvList import get_rsv_list
 # from getFreeList import get_free_list
-from getFreeList import make_chk_date_list, chk_free_room
+
+from getFreeRoom import make_chk_date_list, chk_free_room_bs
 
 from reserve import reserve_room
 
@@ -79,18 +80,43 @@ class FureaiNet:
             self.isHeroku = False
 
         # コマンドライン引数の吸出し
-        parser = argparse.ArgumentParser(description='ふれあいネットチェッカー')    # 2. パーサを作る
+        parser = argparse.ArgumentParser(
+            description='ふれあいネットチェッカー')    # 2. パーサを作る
 
         # 3. parser.add_argumentで受け取る引数を追加していく
-        parser.add_argument('--smtp_user', help='SMTP login username', default=env_SMTP_USER)    # 必須の引数を追加
-        parser.add_argument('--smtp_passwd', help='SMTP longin password', default=env_SMTP_PASSWD)
-        parser.add_argument('--from_addr', help='from adress', default=env_FROM_ADDRESS)    # オプション引数（指定しなくても良い引数）を追加
-        parser.add_argument('--to_addr', help='to adress', default=env_TO_ADDRESS)    # オプション引数（指定しなくても良い引数）を追加
-        parser.add_argument('--cc_addr', help='cc adress', default=env_CC_ADDRESS)    # オプション引数（指定しなくても良い引数）を追加
-        parser.add_argument('--bcc_addr', help='bcc adress', default=env_BCC_ADDRESS)    # オプション引数（指定しなくても良い引数）を追加
-        parser.add_argument('--mail_subject', help='mail subject', default=env_MAIL_SUBJECT)    # オプション引数（指定しなくても良い引数）を追加
+        parser.add_argument(
+            '--smtp_user',
+            help='SMTP login username',
+            default=env_SMTP_USER)    # 必須の引数を追加
+        parser.add_argument(
+            '--smtp_passwd',
+            help='SMTP longin password',
+            default=env_SMTP_PASSWD)
+        parser.add_argument(
+            '--from_addr',
+            help='from adress',
+            default=env_FROM_ADDRESS)    # オプション引数（指定しなくても良い引数）を追加
+        parser.add_argument(
+            '--to_addr',
+            help='to adress',
+            default=env_TO_ADDRESS)    # オプション引数（指定しなくても良い引数）を追加
+        parser.add_argument(
+            '--cc_addr',
+            help='cc adress',
+            default=env_CC_ADDRESS)    # オプション引数（指定しなくても良い引数）を追加
+        parser.add_argument(
+            '--bcc_addr',
+            help='bcc adress',
+            default=env_BCC_ADDRESS)    # オプション引数（指定しなくても良い引数）を追加
+        parser.add_argument(
+            '--mail_subject',
+            help='mail subject',
+            default=env_MAIL_SUBJECT)    # オプション引数（指定しなくても良い引数）を追加
 
-        parser.add_argument('--exec_mode', help='execute mode [lot/rsv/chk]', default=env_FC_EXEC_MODE)    # オプション引数（指定しなくても良い引数）を追加
+        parser.add_argument(
+            '--exec_mode',
+            help='execute mode [lot/rsv/chk]',
+            default=env_FC_EXEC_MODE)    # オプション引数（指定しなくても良い引数）を追加
         parser.add_argument('-a', '--arg4')   # よく使う引数なら省略形があると使う時に便利
 
         args = parser.parse_args()    # 4. 引数を解析
@@ -117,9 +143,13 @@ class FureaiNet:
         # ファイルへ出力するハンドラーを定義
         self.today = datetime.datetime.now()
         # self.logFile = "_log\\Fureai-Net_{}.log".format( self.today.strftime("%Y%m%d_%H%M%S") )
-        self.logFile = "_log\\Fureai-Net_{}.log".format(self.today.strftime("%Y%m%d"))
+        self.logFile = "__log\\Fureai-Net_{}.log".format(
+            self.today.strftime("%Y%m%d"))
         print('logFile:' + self.logFile)
-        fh = logging.FileHandler(filename=self.logFile, mode='w', encoding='utf-8')
+        fh = logging.FileHandler(
+            filename=self.logFile,
+            mode='w',
+            encoding='utf-8')
         fh.setLevel(logging.INFO)
         # fh.setFormatter(formatter)
 
@@ -178,13 +208,14 @@ class FureaiNet:
         url = "https://www.fureai-net.city.kawasaki.jp/user/view/user/homeIndex.html"
         self.driver.get(url)
 
-        time.sleep(0.5)  # 待ちを入れてみる
+        time.sleep(0.3)  # 待ちを入れてみる
 
         # ログインボタン押下
         # self.driver.find_element_by_id('login_on').click()
-        self.driver.execute_script("javascript:return doSubmit('childForm', 'doLogin');")
+        self.driver.execute_script(
+            "javascript:return doSubmit('childForm', 'doLogin');")
 
-        time.sleep(0.5)  # 待ちを入れてみる
+        time.sleep(0.3)  # 待ちを入れてみる
 
         # ログイン（情報入力＆ログイン）
         userid = dic.card_ID[username]
@@ -194,24 +225,24 @@ class FureaiNet:
         self.driver.find_element_by_id('passwd').send_keys(str(passwd))
         self.driver.find_element_by_id('doLogin').click()
 
-        time.sleep(0.5)  # 待ちを入れてみる
+        time.sleep(0.3)  # 待ちを入れてみる
 
         # 時間外チェック
-        elements = self.driver.find_elements_by_id('MSG')
-        for e in elements:
-            chkmsg = e.text
-            if "運用時間外" in chkmsg:
-                print("----運用時間外----")
-                result_msg += "運用時間外"
-                self.login_state = False
-                return result_msg
+        # elements = self.driver.find_elements_by_id('MSG')
+        # for e in elements:
+        #     chkmsg = e.text
+        #     if "運用時間外" in chkmsg:
+        #         print("----運用時間外----")
+        #         result_msg += "運用時間外"
+        #         self.login_state = False
+        #         return result_msg
 
         # ログイン成功
         print("OK!")
         result_msg += "login OK!"
         self.login_state = True
 
-        time.sleep(0.5)  # 待ちを入れてみる
+        time.sleep(0.3)  # 待ちを入れてみる
 
         # マイページが表示されているので
         # 予約情報を取得
@@ -234,7 +265,13 @@ class FureaiNet:
         dic.card_RSV[username] = rsvCount
         dic.card_LOT[username] = lotCount
 
-        data.accountInf.append(data.accountInfo(username, userid, passwd, rsvCount, lotCount))
+        data.accountInf.append(
+            data.accountInfo(
+                username,
+                userid,
+                passwd,
+                rsvCount,
+                lotCount))
 
         return result_msg
 
@@ -281,7 +318,8 @@ class FureaiNet:
         if body == "":
             body = self.BODY
 
-        msg = sendMail.create_message(from_addr, to_addr, cc_addr, bcc_addr, subject, body)
+        msg = sendMail.create_message(
+            from_addr, to_addr, cc_addr, bcc_addr, subject, body)
         sendMail.send(self.SMTP_USER, self.SMTP_PASSWD, msg)
 
     # public method
@@ -354,7 +392,7 @@ class FureaiNet:
             # 空き探索する場合  ※これはサービス休止中でも可能
             if ("chk" in self.EXEC_MODE):
                 chk_list = make_chk_date_list()
-                msg += chk_free_room(self, chk_list)
+                msg += chk_free_room_bs(self, chk_list)
             #    msg += get_free_list(self, date_from, date_to)
 
             # これ以降の確認は サービス時間でないと 実行できない
@@ -369,8 +407,24 @@ class FureaiNet:
 
                 # 予約実行 予約リストで予約
                 if ("dorsv" in self.EXEC_MODE):
-                    rsv_list.append(rsv_datum('歌の会', '2019', '11', '15', '', '麻生／視聴覚', '午後'))
-                    rsv_list.append(rsv_datum('歌の会', '2019', '12', '15', '', '高津／第２音楽', '午後'))
+                    rsv_list.append(
+                        rsv_datum(
+                            '歌の会',
+                            '2019',
+                            '11',
+                            '15',
+                            '',
+                            '麻生／視聴覚',
+                            '午後'))
+                    rsv_list.append(
+                        rsv_datum(
+                            '歌の会',
+                            '2019',
+                            '12',
+                            '15',
+                            '',
+                            '高津／第２音楽',
+                            '午後'))
                     msg = reserve_room(self, rsv_list)
 
             # =================================
@@ -378,7 +432,9 @@ class FureaiNet:
             # =================================
 
             # data をソート
-            room_data2 = sorted(room_data, key=lambda x: (x[0], x[2], x[3], x[4]))
+            room_data2 = sorted(
+                room_data, key=lambda x: (
+                    x[0], x[2], x[3], x[4]))
 
             # dataを csv に 書き出す
             rw_csv.write_data(FCHK_DATA, room_data2)
@@ -388,8 +444,26 @@ class FureaiNet:
             rsv_data = list(filter(lambda x: '予約' in x[0], room_data2))
             lot_data = list(filter(lambda x: '抽選' in x[0], room_data2))
 
-            chk_data2 = list(filter(lambda x: (x.pm in {'0', '空'}) and (x.rank in {'〇', '◎', '◆', '△'}), chk_data))
-            rsv_data2 = list(filter(lambda x: (x.rank in {"〇", "△", "◆"}), rsv_data))
+            chk_data2 = list(
+                filter(
+                    lambda x: (
+                        x.pm in {
+                            '0',
+                            '空'}) and (
+                        x.rank in {
+                            '〇',
+                            '◎',
+                            '◆',
+                            '△'}),
+                    chk_data))
+            rsv_data2 = list(
+                filter(
+                    lambda x: (
+                        x.rank in {
+                            "〇",
+                            "△",
+                            "◆"}),
+                    rsv_data))
 
             # ログメッセージ
             # msg = ">> ふれあいネット <<\n"
@@ -412,7 +486,7 @@ class FureaiNet:
                 # 'bname', 'iname',
                 # 'am', 'pm', 'night','rank')
                 for i in chk_data2:
-                    print(i)
+                    # print(i)
                     msg += "{0} {1}/{2}{3} {4}~{5} {6}/{7}({8})\n".format(
                         i.username[0:1],
                         # str(i.year)[2:],
@@ -440,7 +514,7 @@ class FureaiNet:
                 # 'bname', 'iname',
                 # 'am', 'pm', 'night','rank')
                 for i in rsv_data2:
-                    print(i)
+                    # print(i)
                     msg += "{0} {1}/{2}{3} {4}~{5} {6}/{7}({8})\n".format(
                         i.username[0:1],
                         # str(i.year)[2:],
@@ -461,7 +535,7 @@ class FureaiNet:
                 # 利用日時, 開始, 終了, 館名, 施設名, 支払状況
                 for i in rsv_data:
 
-                    print(i)
+                    # print(i)
                     msg += "{0} {1}/{2}/{3} {4}~{5} {6}/{7}({8})\n".format(
                         i.username[0:1],
                         # str(i.year)[2:],
@@ -480,7 +554,7 @@ class FureaiNet:
                 # 収集リストの表示
                 # 利用日時, 開始, 終了, 館名, 施設名, 支払状況
                 for i in lot_data:
-                    print(i)
+                    # print(i)
                     msg += "{0} {1}/{2} {3}~{4} {5}/{6}({7})\n".format(
                         i.username[0:1],
                         # i.year,
