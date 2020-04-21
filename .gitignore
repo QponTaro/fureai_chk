@@ -3,6 +3,7 @@ venv/
 venv_fnc/
 __doc/
 __log/
+__trush
 __pycache__/
 *.pyc
 *.csv
